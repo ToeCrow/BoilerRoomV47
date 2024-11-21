@@ -8,6 +8,39 @@
  <script src="script.js" defer></script>
 </head>
 <body>
- 
+  <header>
+    <h1>Nyhetsaggregator</h1>
+  </header>
+  <main>
+    <section class="search-section">
+      <input type="text" id="search-input" placeholder="Sök efter nyheter..." />
+      <button id="search-button">Sök</button>
+    </section>
+    
+    <section class="filter-section">
+      <label for="category-filter">Filtrera efter kategori:</label>
+      <select id="category-filter">
+        <option value="all">Alla</option>
+        <option value="technology">Teknik</option>
+        <option value="sports">Sport</option>
+        <option value="economy">Ekonomi</option>
+        <!-- Lägg till fler kategorier baserat på API -->
+      </select>
+    </section>
+
+    <section class="news-section" id="news-section">
+      <p>Dynamiskt laddade nyhetsartiklar</p>
+    </section>
+
+    <section class="pagination-section">
+      <button id="prev-page" disabled>&lt; Föregående</button>
+      <span id="current-page">1</span>
+      <button id="next-page">&gt; Nästa</button>
+    </section>
+  </main>
+  <footer>
+    <p>Utvecklat av Grupp [Gruppnamn]</p>
+  </footer>
+  <script src="script.js"></script>
 </body>
 </html>
