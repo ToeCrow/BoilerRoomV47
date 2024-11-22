@@ -41,23 +41,43 @@ async function fetchNews(url) {
         const response = await fetch(url);
 
         // Kontrollera HTTP-statuskoder
-        
+
         if (!response.ok) {
+            const errorMessage = document.createElement("p");
+            errorMessage.classList.add("error-message");
+
             switch (response.status) {
                 case 400:
-                    throw new Error("Ogiltig begäran (400). Kontrollera din input.");
+                    errorMessage.textContent = "Ogiltig begäran (400). Kontrollera din input.";
+                    break;
+                    
                 case 401:
-                    throw new Error("Obehörig åtkomst (401). Kontrollera din API-nyckel.");
+                    errorMessage.textContent = "Obehörig åtkomst (401). Kontrollera din API-nyckel.";
+                    break;
+                    
                 case 404:
-                    throw new Error("Resursen kunde inte hittas (404).");
+                    errorMessage.textContent = "Resursen kunde inte hittas (404).";
+                    break;
+                    
                 case 429:
-                    throw new Error("För många förfrågningar (429). Försök igen senare.");
+                    errorMessage.textContent = "För många förfrågningar (429). Försök igen senare.";
+                    break;
+                    
                 case 500:
-                    throw new Error("Serverfel (500). Försök igen senare.");
+                    errorMessage.textContent = "Serverfel (500). Försök igen senare.";
+                    break;
+                    
                 default:
-                    throw new Error(`Okänt fel (${response.status}).`);
+                    errorMessage.textContent = `Okänt fel (${response.status}).`;
+                    
             }
+
+            newsList.innerHTML = ""; // Clear existing news items
+            newsList.appendChild(errorMessage);
+
+            throw new Error(errorMessage.textContent);
         }
+
         // Parsar JSON-data
         const data = await response.json();
 
@@ -65,8 +85,14 @@ async function fetchNews(url) {
         if (!data || !data.articles || data.articles.length === 0) {
             console.log("Inga resultat hittades för din sökfråga");
             
+            newsList.innerHTML = ""; // Clear existing news items
+
+            const emptyMessage = document.createElement("p");
+            emptyMessage.textContent = "Inga nyheter hittades.";
+            newsList.appendChild(emptyMessage);
             return "Inga resultat hittades för din sökfråga.";
         }
+
 
         displayNews(data.articles);
         
@@ -122,13 +148,7 @@ function displayNews(data) {
     
     newsList.innerHTML = ""; // Clear existing news items
 
-    // check if data is empty
-    if (!articles || articles.length === 0) {
-      const emptyMessage = document.createElement("p");
-      emptyMessage.textContent = "Inga nyheter hittades.";
-      newsList.appendChild(emptyMessage);
-      return;
-  }
+
 
     /* const title = data.title; // replace with actual input
     const description = data.description;  
