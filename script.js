@@ -44,7 +44,6 @@ async function fetchNews(url) {
 /* console.log(`API Key: ${API_KEY}`); */
 
 // Funktion för att formatera timestamp (svenskt datumformat utan sekunder)
-//! kolla så paramertern stämmer
 function formatDate(publishedAt) {
  const date = new Date(publishedAt);
  const options = {
@@ -77,6 +76,14 @@ function displayNews(data) {
     console.log(newsList);
     
     newsList.innerHTML = ""; // Clear existing news items
+
+    // check if data is empty
+    if (!articles || articles.length === 0) {
+      const emptyMessage = document.createElement("p");
+      emptyMessage.textContent = "Inga nyheter hittades.";
+      newsList.appendChild(emptyMessage);
+      return;
+  }
 
     const title = data.title; // replace with actual input
     const description = data.description;  
