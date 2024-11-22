@@ -66,6 +66,10 @@ button:disabled {
  margin: .75rem;
 }
 
+.news-date{
+    right: .5rem;
+   }
+   
 .news-item h2 {
  margin: 0;
  font-size: 1.5rem;
