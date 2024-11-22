@@ -50,6 +50,41 @@ searchButton.addEventListener("click", () => {
 
     displayNews(); // todo - byt namn på function till rätt - hämta nyheter, input från gustavs fetchFunktion
 });
+//insert din api key
+const API_KEY = 'ec19788c6a6f48008d20c22404dea314'; 
+//lägg in url du vill hämta data från
+const BASE_URL = 'https://newsapi.org/v2/top-headlines';
+
+async function fetchNews(country = 'us', category = '', query = '') {
+    try {
+        const url = new URL(BASE_URL);
+        url.searchParams.append('apiKey', API_KEY);
+        url.searchParams.append('country', country);
+
+        // Gör en GET-förfrågan
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`Fel vid hämtning: ${response.status}`);
+        }
+
+        // Parsar JSON-data
+        const data = await response.json();
+
+        console.log('Hämtade artiklar:', data.articles);
+        
+        return data.articles;
+
+    } catch (error) {
+        console.error('Ett fel uppstod vid hämtning av nyheter:', error);
+        return []; 
+    }
+}
+
+fetchNews()
+
+
+
 
 
 const categoryFilter = document.getElementById("category-filter");
