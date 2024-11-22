@@ -1,13 +1,17 @@
-//insert din api key
-const API_KEY = 'ec19788c6a6f48008d20c22404dea314'; 
+// script.js
+import { API_KEY } from "./config.js";
+const apiKey = API_KEY;
+
 //lägg in url du vill hämta data från
 const BASE_URL = 'https://newsapi.org/v2/top-headlines';
 
-async function fetchNews(country = 'us', category = '', query = '') {
+async function fetchNews(country = 'us', category = '', query = searchInput.value) {
     try {
         const url = new URL(BASE_URL);
         url.searchParams.append('apiKey', API_KEY);
         url.searchParams.append('country', country);
+        url.searchParams.append('category', category);
+        url.searchParams.append('query', query);
 
         // Gör en GET-förfrågan
         const response = await fetch(url);
@@ -19,9 +23,13 @@ async function fetchNews(country = 'us', category = '', query = '') {
         // Parsar JSON-data
         const data = await response.json();
 
-        console.log('Hämtade artiklar:', data.articles);
+        displayNews();
         
-        return data.articles;
+        console.log("fetchNews output: ", data.articles);
+        
+
+        return data.articles; //  returns array ??
+        
 
     } catch (error) {
         console.error('Ett fel uppstod vid hämtning av nyheter:', error);
@@ -29,12 +37,7 @@ async function fetchNews(country = 'us', category = '', query = '') {
     }
 }
 
-fetchNews()
 
-
-
-// script.js
-import { API_KEY } from "./config.js";
 
 /* console.log(`API Key: ${API_KEY}`); */
 
@@ -58,23 +61,22 @@ const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsList = document.getElementById("news-list"); // ul element
 
-const apiKey = API_KEY;
+
 
 function searchNews() {
-    const query = searchInput.value + "&";
+    const query = "q=" + searchInput.value + "&";
     
-/*     const url = `https://newsapi.org/v2/everything?q=${query}&apiKey=${apiKey}`; */
-    const url = `https://newsapi.org/v2/everything?q=${query}apiKey=${apiKey}`;    
+    const url = `https://newsapi.org/v2/everything?${query}apiKey=${apiKey}`;    
 
     console.log("apiKey: ", apiKey);
     console.log("query: ", query);
     console.log("url som returneras: ", url);
     
 
-    return url;
+    return query; // q= + searchInput.value + &
 }
 
-function displayNews() {
+function displayNews(news = []) {
     console.log(newsList);
     
     newsList.innerHTML = ""; // Clear existing news items
@@ -91,14 +93,14 @@ function displayNews() {
       date
     );
 
-/*     news.forEach((article) => {
+    news.forEach((article) => { //! FUNKAR INTE
       createNewsElement(
         article.title,
         article.description,
         article.source.name,
         article.publishedAt
       );
-    }); */
+    });
 
 }
 
@@ -136,40 +138,23 @@ function displayNews() {
 // event listener search
 searchButton.addEventListener("click", () => {
     
-    const url = searchNews(); // returns url
+    const query = searchNews(); // returns search query
 
-    //! byt namn på function till rätt
-    getNews(url); //todo gustavs funktion vad-den-nu-heter */
+    fetchNews(); 
 
-    displayNews(); // todo - byt namn på function till rätt - hämta nyheter, input från gustavs fetchFunktion
 });
 
-    fetch(`https://newsapi.org/v2/top-headlines?country=SE&apiKey=${API_KEY}`)
-    .then(response => response.json())
-    .then(data => {
-        const newsSection = document.getElementById("news-section");
-        newsSection.innerHTML = "";
-        data.articles.forEach(article => {
-            const articleElement = document.createElement("div");
-            articleElement.classList.add("article");
-            articleElement.innerHTML = `
-            <h2>${article.title}</h2>
-            <p>${article.description}</p>
-            <a href="${article.url}" target="_blank">Läs mer</a>
-            `;
-            newsSection.appendChild(articleElement);
-        });
 
-    })
-const categoryFilter = document.getElementById("category-filter");
-categoryFilter.addEventListener("change", (event) => {
-    const selectedCategory = event.target.value;
-    const newsSection = document.getElementById("news-section");
-    newsSection.innerHTML = "";
-});try {
-  // code that might throw an error
-} catch (error) {
-  // code to handle the error
-}
+// FILTER
 
-
+  const categoryFilter = document.getElementById("category-filter");
+  categoryFilter.addEventListener("change", filterNews);
+  function filterNews(event) {
+  
+  const selectedCategory = event.target.value;
+  let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
+  
+  
+  console.log("filteredFetch: ", filteredFetch);
+  return filteredFetch
+  };
