@@ -23,11 +23,11 @@ const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsList = document.getElementById("news-list"); // ul element
 
-// createNewsElement - Function to create elements and append to newsList
+const apiKey = API_KEY;
 
 function searchNews() {
     const query = searchInput.value + "&";
-    const apiKey = API_KEY;
+    
 /*     const url = `https://newsapi.org/v2/everything?q=${query}&apiKey=${apiKey}`; */
     const url = `https://newsapi.org/v2/everything?q=${query}apiKey=${apiKey}`;    
 
@@ -98,8 +98,6 @@ function displayNews() {
 // SEARCH NEWS function which returns url for fetch
 
 
-
-
 // event listener search
 searchButton.addEventListener("click", () => {
     
@@ -110,12 +108,9 @@ searchButton.addEventListener("click", () => {
 
     displayNews(); // todo - byt namn på function till rätt - hämta nyheter, input från gustavs fetchFunktion
 });
+=========
 
-function getNews(url) {
-
-    urlAll = `https://newsapi.org/v2/top-headlines?country=SE&apiKey=${API_KEY}`;
-
-    fetch(url)
+    fetch(`https://newsapi.org/v2/top-headlines?country=SE&apiKey=${API_KEY}`)
     .then(response => response.json())
     .then(data => {
         const newsSection = document.getElementById("news-section");
@@ -142,5 +137,5 @@ categoryFilter.addEventListeners("change", (event) => {
 } catch (error) {
   // code to handle the error
 }
+>>>>>>>>> Temporary merge branch 2
 
-};
