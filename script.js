@@ -21,11 +21,10 @@ function formatDate(timestamp) {
 
 const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
-const newsContainer = document.getElementById("news-container");
+const newsList = document.getElementById("news-list"); // ul element
 
+// createNewsElement - Function to create elements and append to newsList
 
-
-// SEARCH NEWS function which returns url for fetch
 function searchNews() {
     const query = searchInput.value + "&";
     const apiKey = API_KEY;
@@ -38,7 +37,66 @@ function searchNews() {
     
 
     return url;
-};
+}
+
+function displayNews() {
+    console.log(newsList);
+    
+    newsList.innerHTML = ""; // Clear existing news items
+
+    const titel = "TEST Nyhetstitel"; // replace with actual input
+    const description = "TEST Nyhetstext";
+    const source = "TEST Nyhetkalla";
+    const date = "2024-01-01T00:00:00Z";
+
+    createNewsElement( // calls function to create new element based on input values
+      titel,
+      description,
+      source,
+      date
+    );
+
+/*     news.forEach((article) => {
+      createNewsElement(
+        article.title,
+        article.description,
+        article.source.name,
+        article.publishedAt
+      );
+    }); */
+
+}
+
+  function createNewsElement(title, description, source, date) {
+    const newsItem = document.createElement("li");
+    newsItem.classList.add("news-item");
+  
+    const newsTitle = document.createElement("h2");
+    newsTitle.classList.add("news-title");
+    newsTitle.textContent = title;
+  
+    const newsDescription = document.createElement("p");
+    newsDescription.classList.add("news-description");
+    newsDescription.textContent = description;
+  
+    const newsSource = document.createElement("small");
+    newsSource.classList.add("news-source");
+    newsSource.textContent = source;
+  
+    const newsDate = document.createElement("small");
+    newsDate.classList.add("news-date");
+    newsDate.textContent = formatDate(date);
+  
+    newsItem.appendChild(newsTitle);
+    newsItem.appendChild(newsDescription);
+    newsItem.appendChild(newsSource);
+    newsItem.appendChild(newsDate);
+  
+    newsList.appendChild(newsItem);
+}
+
+// SEARCH NEWS function which returns url for fetch
+
 
 
 
@@ -47,8 +105,8 @@ searchButton.addEventListener("click", () => {
     
     const url = searchNews(); // returns url
 
-    //! todo - byt namn på function till rätt
-    fetchFunktion(url); //todo gustavs funktion vad-den-nu-heter
+    //! byt namn på function till rätt
+  /*   fetchFunktion(url); *///todo gustavs funktion vad-den-nu-heter */
 
     displayNews(); // todo - byt namn på function till rätt - hämta nyheter, input från gustavs fetchFunktion
 });
