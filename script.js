@@ -7,6 +7,28 @@ const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsList = document.getElementById("news-list"); // ul element
 
+
+// async function fetchData(apiUrl, userQuery, apiKey) {
+//     // Validering av användarens sökinput
+    
+
+//     const url = `${apiUrl}?query=${encodeURIComponent(userQuery)}&apiKey=${apiKey}`;
+
+//     try {
+//         const response = await fetch(url);
+
+        
+
+//         const data = await response.json();
+
+        
+
+//         return data; // Returnera resultaten om allt fungerar
+//     } 
+// };
+
+
+
 async function fetchNews(url) {
     try {
         /* const url = new URL(BASE_URL);
@@ -18,12 +40,33 @@ async function fetchNews(url) {
         // Gör en GET-förfrågan
         const response = await fetch(url);
 
+        // Kontrollera HTTP-statuskoder
+        
         if (!response.ok) {
-            throw new Error(`Fel vid hämtning: ${response.status}`);
+            switch (response.status) {
+                case 400:
+                    throw new Error("Ogiltig begäran (400). Kontrollera din input.");
+                case 401:
+                    throw new Error("Obehörig åtkomst (401). Kontrollera din API-nyckel.");
+                case 404:
+                    throw new Error("Resursen kunde inte hittas (404).");
+                case 429:
+                    throw new Error("För många förfrågningar (429). Försök igen senare.");
+                case 500:
+                    throw new Error("Serverfel (500). Försök igen senare.");
+                default:
+                    throw new Error(`Okänt fel (${response.status}).`);
+            }
         }
-
         // Parsar JSON-data
         const data = await response.json();
+
+        // Hantera fall där API returnerar tomma resultat
+        if (!data || !data.articles || data.articles.length === 0) {
+            console.log("Inga resultat hittades för din sökfråga");
+            
+            return "Inga resultat hittades för din sökfråga.";
+        }
 
         displayNews(data.articles);
         
@@ -34,8 +77,9 @@ async function fetchNews(url) {
         
 
     } catch (error) {
-        console.error('Ett fel uppstod vid hämtning av nyheter:', error);
-        return []; 
+        // Logga felet för utveckling eller visa användarvänligt felmeddelande
+        console.error("Ett fel inträffade:", error.message);
+        return error.message;
     }
 }
 
@@ -62,13 +106,14 @@ function formatDate(publishedAt) {
 
 
 function searchNews() {
-    const query = "q=" + searchInput.value + "&";
-    
+    const query = "q=" + searchInput.value.trim() + "&";
+    if (searchInput.value.trim() === "") {
+        console.log("Sökfrågan kan inte vara tom. Ange ett giltigt sökord.");
+        return "Sökfrågan kan inte vara tom. Ange ett giltigt sökord.";
+    }
+
     const url = `https://newsapi.org/v2/top-headlines?${query}apiKey=${apiKey}`;    
-
     console.log("url som returneras: ", url);
-    
-
     return url; // returns url
 }
 
@@ -85,17 +130,17 @@ function displayNews(data) {
       return;
   }
 
-    const title = data.title; // replace with actual input
+    /* const title = data.title; // replace with actual input
     const description = data.description;  
     const source = data.name;
-    const date = formatDate(data.publishedAt); //data.articles.publishedAt;
+    const date = formatDate(data.publishedAt); //data.articles.publishedAt; */
 
-    createNewsElement( // calls function to create new element based on input values
+/*     createNewsElement( // calls function to create new element based on input values
       title,
       description,
       source,
       date
-    );
+    ); */
 
     data.forEach((article) => { 
       createNewsElement(
