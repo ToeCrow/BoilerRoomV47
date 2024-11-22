@@ -108,7 +108,6 @@ searchButton.addEventListener("click", () => {
 
     displayNews(); // todo - byt namn på function till rätt - hämta nyheter, input från gustavs fetchFunktion
 });
-=========
 
     fetch(`https://newsapi.org/v2/top-headlines?country=SE&apiKey=${API_KEY}`)
     .then(response => response.json())
@@ -128,7 +127,7 @@ searchButton.addEventListener("click", () => {
 
     })
 const categoryFilter = document.getElementById("category-filter");
-categoryFilter.addEventListeners("change", (event) => {
+categoryFilter.addEventListener("change", (event) => {
     const selectedCategory = event.target.value;
     const newsSection = document.getElementById("news-section");
     newsSection.innerHTML = "";
@@ -137,5 +136,5 @@ categoryFilter.addEventListeners("change", (event) => {
 } catch (error) {
   // code to handle the error
 }
->>>>>>>>> Temporary merge branch 2
+
 
