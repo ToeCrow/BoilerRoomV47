@@ -23,12 +23,12 @@ const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsContainer = document.getElementById("news-container");
 
-
+const apiKey = API_KEY;
 
 // SEARCH NEWS function which returns url for fetch
 function searchNews() {
     const query = searchInput.value + "&";
-    const apiKey = API_KEY;
+    
 /*     const url = `https://newsapi.org/v2/everything?q=${query}&apiKey=${apiKey}`; */
     const url = `https://newsapi.org/v2/everything?q=${query}apiKey=${apiKey}`;    
 
@@ -39,8 +39,6 @@ function searchNews() {
 
     return url;
 };
-
-
 
 // event listener search
 searchButton.addEventListener("click", () => {
@@ -54,26 +52,13 @@ searchButton.addEventListener("click", () => {
 });
 
 
-fetch(`https://newsapi.org/v2/top-headlines?country=SE&apiKey=${API_KEY}`)
-.then(response => response.json())
-.then(data => {
-    const newsSection = document.getElementById("news-section");
-    newsSection.innerHTML = "";
-    data.articles.forEach(article => {
-        const articleElement = document.createElement("div");
-        articleElement.classList.add("article");
-        articleElement.innerHTML = `
-        <h2>${article.title}</h2>
-        <p>${article.description}</p>
-        <a href="${article.url}" target="_blank">Läs mer</a>
-        `;
-        newsSection.appendChild(articleElement);
-    });
-
-});
 const categoryFilter = document.getElementById("category-filter");
-categoryFilter.addEventListeners("change", (event) => {
+categoryFilter.addEventListener("change", filterNews);
+function filterNews(event) {
+
 const selectedCategory = event.target.value;
-const newsSection = document.getElementById("news-section");
-newsSection.innerHTML = "";
-});
+let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
+
+console.log("filteredFetch: ", filteredFetch);
+return filteredFetch
+};
