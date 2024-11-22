@@ -106,12 +106,16 @@ searchButton.addEventListener("click", () => {
     const url = searchNews(); // returns url
 
     //! byt namn på function till rätt
-  /*   fetchFunktion(url); *///todo gustavs funktion vad-den-nu-heter */
+    getNews(url); //todo gustavs funktion vad-den-nu-heter */
 
     displayNews(); // todo - byt namn på function till rätt - hämta nyheter, input från gustavs fetchFunktion
 });
 
-    fetch(`https://newsapi.org/v2/top-headlines?country=SE&apiKey=${API_KEY}`)
+function getNews(url) {
+
+    urlAll = `https://newsapi.org/v2/top-headlines?country=SE&apiKey=${API_KEY}`;
+
+    fetch(url)
     .then(response => response.json())
     .then(data => {
         const newsSection = document.getElementById("news-section");
@@ -138,3 +142,5 @@ categoryFilter.addEventListeners("change", (event) => {
 } catch (error) {
   // code to handle the error
 }
+
+};
