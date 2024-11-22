@@ -23,12 +23,14 @@ const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsContainer = document.getElementById("news-container");
 
-// event listeners
+// event listener search
 searchButton.addEventListener("click", () => {
     
     const url = fetchNews(); // returns url
 
-    displayNews(url); // todo - hämta nyheter, input variabel är url
+    fetchFunktion(url); //todo gustavs funktion vad-den-nu-heter
+
+    displayNews(); // todo - byt namn på function till rätt - hämta nyheter, input från gustavs fetchFunktion
 });
 
 
