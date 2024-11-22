@@ -1,17 +1,19 @@
 // script.js
 import { API_KEY } from "./config.js";
 const apiKey = API_KEY;
-
 //lägg in url du vill hämta data från
 const BASE_URL = 'https://newsapi.org/v2/top-headlines';
+const searchInput = document.getElementById("search-input");
+const searchButton = document.getElementById("search-button");
+const newsList = document.getElementById("news-list"); // ul element
 
-async function fetchNews(country = 'us', category = '', query = searchInput.value) {
+async function fetchNews(url) {
     try {
-        const url = new URL(BASE_URL);
-        url.searchParams.append('apiKey', API_KEY);
-        url.searchParams.append('country', country);
-        url.searchParams.append('category', category);
+        /* const url = new URL(BASE_URL);
+        /* url.searchParams.append('country', country); */
+        /* url.searchParams.append('category', category);
         url.searchParams.append('query', query);
+        url.searchParams.append('apiKey', API_KEY); */
 
         // Gör en GET-förfrågan
         const response = await fetch(url);
@@ -23,12 +25,12 @@ async function fetchNews(country = 'us', category = '', query = searchInput.valu
         // Parsar JSON-data
         const data = await response.json();
 
-        displayNews();
+        displayNews(data.articles);
         
         console.log("fetchNews output: ", data.articles);
         
-
-        return data.articles; //  returns array ??
+        return data.articles; //  returns articles as JS list
+        
         
 
     } catch (error) {
@@ -43,8 +45,8 @@ async function fetchNews(country = 'us', category = '', query = searchInput.valu
 
 // Funktion för att formatera timestamp (svenskt datumformat utan sekunder)
 //! kolla så paramertern stämmer
-function formatDate(timestamp) {
- const date = new Date(timestamp);
+function formatDate(publishedAt) {
+ const date = new Date(publishedAt);
  const options = {
    weekday: 'short',
    year: 'numeric',
@@ -57,48 +59,43 @@ function formatDate(timestamp) {
  return date.toLocaleString('sv-SE', options);
 }
 
-const searchInput = document.getElementById("search-input");
-const searchButton = document.getElementById("search-button");
-const newsList = document.getElementById("news-list"); // ul element
 
 
 
 function searchNews() {
     const query = "q=" + searchInput.value + "&";
     
-    const url = `https://newsapi.org/v2/everything?${query}apiKey=${apiKey}`;    
+    const url = `https://newsapi.org/v2/top-headlines?${query}apiKey=${apiKey}`;    
 
-    console.log("apiKey: ", apiKey);
-    console.log("query: ", query);
     console.log("url som returneras: ", url);
     
 
-    return query; // q= + searchInput.value + &
+    return url; // returns url
 }
 
-function displayNews(news = []) {
+function displayNews(data) {
     console.log(newsList);
     
     newsList.innerHTML = ""; // Clear existing news items
 
-    const titel = "TEST Nyhetstitel"; // replace with actual input
-    const description = "TEST Nyhetstext";
-    const source = "TEST Nyhetkalla";
-    const date = "2024-01-01T00:00:00Z";
+    const title = data.title; // replace with actual input
+    const description = data.description;  
+    const source = data.name;
+  /*   const date = formatDate(data.publishedAt); //data.articles.publishedAt; */
 
     createNewsElement( // calls function to create new element based on input values
-      titel,
+      title,
       description,
-      source,
-      date
+      source
+     /*  date */
     );
 
-    news.forEach((article) => { //! FUNKAR INTE
+    data.forEach((article) => { 
       createNewsElement(
         article.title,
         article.description,
-        article.source.name,
-        article.publishedAt
+        article.source.name
+        /* article.publishedAt */
       );
     });
 
@@ -138,9 +135,12 @@ function displayNews(news = []) {
 // event listener search
 searchButton.addEventListener("click", () => {
     
-    const query = searchNews(); // returns search query
+    const url = searchNews();
+    
+    console.log("url: ", url);
+    // returns url for search
 
-    fetchNews(); 
+    fetchNews(url); 
 
 });
 
@@ -154,7 +154,7 @@ searchButton.addEventListener("click", () => {
   const selectedCategory = event.target.value;
   let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
   
-  
+  fetchNews(filteredFetch);
   console.log("filteredFetch: ", filteredFetch);
   return filteredFetch
   };
