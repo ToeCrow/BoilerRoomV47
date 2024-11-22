@@ -1,5 +1,5 @@
 // script.js
-import { fetchNews } from "./scripts/search.js";
+import { API_KEY } from "./config.js";
 
 /* console.log(`API Key: ${API_KEY}`); */
 
@@ -23,16 +23,32 @@ const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsContainer = document.getElementById("news-container");
 
+
+
+// SEARCH NEWS function which returns url for fetch
+function searchNews() {
+    const query = searchInput.value + "&";
+    const apiKey = API_KEY;
+/*     const url = `https://newsapi.org/v2/everything?q=${query}&apiKey=${apiKey}`; */
+    const url = `https://newsapi.org/v2/everything?q=${query}apiKey=${apiKey}`;    
+
+    console.log("apiKey: ", apiKey);
+    console.log("query: ", query);
+    console.log("url som returneras: ", url);
+    
+
+    return url;
+};
+
+
+
 // event listener search
 searchButton.addEventListener("click", () => {
     
-    const url = fetchNews(); // returns url
+    const url = searchNews(); // returns url
 
+    //! todo - byt namn på function till rätt
     fetchFunktion(url); //todo gustavs funktion vad-den-nu-heter
 
     displayNews(); // todo - byt namn på function till rätt - hämta nyheter, input från gustavs fetchFunktion
 });
-
-
-
-export { searchInput, searchButton, newsContainer };
