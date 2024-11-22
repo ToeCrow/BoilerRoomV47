@@ -81,21 +81,21 @@ function displayNews(data) {
     const title = data.title; // replace with actual input
     const description = data.description;  
     const source = data.name;
-  /*   const date = formatDate(data.publishedAt); //data.articles.publishedAt; */
+    const date = formatDate(data.publishedAt); //data.articles.publishedAt;
 
     createNewsElement( // calls function to create new element based on input values
       title,
       description,
-      source
-     /*  date */
+      source,
+      date
     );
 
     data.forEach((article) => { 
       createNewsElement(
         article.title,
         article.description,
-        article.source.name
-        /* article.publishedAt */
+        article.source.name,
+        article.publishedAt
       );
     });
 
