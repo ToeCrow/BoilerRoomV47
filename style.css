@@ -67,9 +67,9 @@ button:disabled {
 }
 
 .news-date{
- right: .5rem;
-}
-
+    right: .5rem;
+   }
+   
 .news-item h2 {
  margin: 0;
  font-size: 1.5rem;
