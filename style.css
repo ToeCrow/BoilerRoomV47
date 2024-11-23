@@ -218,7 +218,7 @@ button:disabled {
 
 .news-description {
  grid-area: description;
- height: 100px;
+ height: 80px;
  overflow: hidden;
  text-overflow: ellipsis;
  display: -webkit-box;
