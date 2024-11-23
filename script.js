@@ -33,6 +33,7 @@ async function fetchNews(url) {
     }
 }
 
+    //uppdaterat formatdate
  function formatDate(publishedAt) {
     if (!publishedAt) return "Okänt datum"; // Fallback om datum saknas
 
