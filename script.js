@@ -31,12 +31,6 @@ const newsList = document.getElementById("news-list"); // ul element
 
 async function fetchNews(url) {
     try {
-        /* const url = new URL(BASE_URL);
-        /* url.searchParams.append('country', country); */
-        /* url.searchParams.append('category', category);
-        url.searchParams.append('query', query);
-        url.searchParams.append('apiKey', API_KEY); */
-
         // Gör en GET-förfrågan
         const response = await fetch(url);
 
@@ -109,26 +103,26 @@ async function fetchNews(url) {
     }
 }
 
+    //uppdaterat formatdate
+ function formatDate(publishedAt) {
+    if (!publishedAt) return "Okänt datum"; // Fallback om datum saknas
 
+    const date = new Date(publishedAt);
 
-/* console.log(`API Key: ${API_KEY}`); */
+    // Kontrollera om datumet är giltigt
+    if (isNaN(date.getTime())) return "Okänt datum";
 
-// Funktion för att formatera timestamp (svenskt datumformat utan sekunder)
-function formatDate(publishedAt) {
- const date = new Date(publishedAt);
- const options = {
-   weekday: 'short',
-   year: 'numeric',
-   month: 'short',
-   day: 'numeric',
-   hour: 'numeric',
-   minute: 'numeric',
-   hour12: false
- };
- return date.toLocaleString('sv-SE', options);
+    const options = {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false
+    };
+    return date.toLocaleString('sv-SE', options);
 }
-
-
 
 
 function searchNews() {
@@ -143,37 +137,55 @@ function searchNews() {
     return url; // returns url
 }
 
+//uppdaterad function för att ta bort removed articles och invalid dates
+
 function displayNews(data) {
     console.log(newsList);
     
     newsList.innerHTML = ""; // Clear existing news items
 
+  const validArticles = data.filter(article => {
+    const isValid = 
+        article.title && 
+        article.description && 
+        article.publishedAt && 
+        article.url && 
+        !article.title.includes("[Removed]") && 
+        !article.description.includes("[Removed]") && 
+        !(article.source && article.source.name && article.source.name.includes("[Removed]"));
+    
+    if (!isValid) {
+        console.warn("Ogiltig eller borttagen artikel ignorerad:", article);
+    }
+    return isValid;
+});
 
-
-    /* const title = data.title; // replace with actual input
-    const description = data.description;  
-    const source = data.name;
-    const date = formatDate(data.publishedAt); //data.articles.publishedAt; */
-
-/*     createNewsElement( // calls function to create new element based on input values
-      title,
-      description,
-      source,
-      date
-    ); */
-
-    data.forEach((article) => { 
-      createNewsElement(
-        article.title,
-        article.description,
-        article.source.name,
-        article.publishedAt
-      );
+    validArticles.forEach((article) => { 
+        createNewsElement(
+            article.title,
+            article.description,
+            article.source.name,
+            article.publishedAt,
+            article.url
+        );
     });
+
+    if (validArticles.length === 0) {
+        const noNewsMessage = document.createElement("p");
+        noNewsMessage.textContent = "Inga artiklar kunde hämtas.";
+        newsList.appendChild(noNewsMessage);
+    }
+
+    if (data.length === 0) {
+        const noResultsMessage = document.createElement("p");
+        noResultsMessage.textContent = "Inga nyheter hittades för din sökning.";
+        newsList.appendChild(noResultsMessage);
+        return;
+    }
 
 }
 
-  function createNewsElement(title, description, source, date) {
+  function createNewsElement(title, description, source, date, url) {
     const newsItem = document.createElement("li");
     newsItem.classList.add("news-item");
   
@@ -192,11 +204,20 @@ function displayNews(data) {
     const newsDate = document.createElement("small");
     newsDate.classList.add("news-date");
     newsDate.textContent = formatDate(date);
+
+    //lagt till läs mer knapp
+    const readMoreButton = document.createElement("a");
+    readMoreButton.classList.add("read-more");
+    readMoreButton.textContent = "Läs mer";
+    readMoreButton.href = url;
+    readMoreButton.target = "_blank"; 
+    readMoreButton.rel = "noopener noreferrer"; 
   
     newsItem.appendChild(newsTitle);
     newsItem.appendChild(newsDescription);
     newsItem.appendChild(newsSource);
     newsItem.appendChild(newsDate);
+    newsItem.appendChild(readMoreButton);
   
     newsList.appendChild(newsItem);
 }
