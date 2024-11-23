@@ -63,7 +63,7 @@ button:disabled {
  border-radius: 8px;
  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
  display: grid;
- grid-template-rows: 2fr auto 1fr 1fr;
+ grid-template-rows: auto 3fr 1fr 1fr;
  grid-template-areas: 
  "title" 
  "description" 
@@ -88,22 +88,37 @@ button:disabled {
  position: relative;
 }
 
+.news-date {
+ grid-area: date;
+ align-self: end;
+ margin-top: 10px;
+ color: #777;
+ font-size: 0.9rem;
+ text-align: right;
+}
+
 
 
 /* display overflow title when hovering */
-/* .news-title:hover {
+.news-title:hover {
  overflow: visible;
  text-overflow: unset;
+ line-clamp: unset;
  -webkit-line-clamp: unset;
  -webkit-box-orient: unset;
-} */
+}
 
 .news-description {
  grid-area: description;
+ height: 100px;
+ overflow: hidden;
+ text-overflow: ellipsis;
+ display: -webkit-box;
 }
 
 .news-source {
  grid-area: source;
+ align-self: end;
 }
 
 .news-item p {
