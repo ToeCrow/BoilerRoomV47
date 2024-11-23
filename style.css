@@ -63,7 +63,7 @@ button:disabled {
  border-radius: 8px;
  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
  display: grid;
- grid-template-rows: 2fr auto 1fr 1fr;
+ grid-template-rows: auto auto 1fr 1fr;
  grid-template-areas: 
  "title" 
  "description" 
@@ -91,12 +91,12 @@ button:disabled {
 
 
 /* display overflow title when hovering */
-/* .news-title:hover {
+.news-title:hover {
  overflow: visible;
  text-overflow: unset;
  -webkit-line-clamp: unset;
  -webkit-box-orient: unset;
-} */
+}
 
 .news-description {
  grid-area: description;
