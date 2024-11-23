@@ -5,12 +5,12 @@
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <title>Nyheter</title>
  <link rel="stylesheet" href="style.css">
- <script src="config.js" defer></script>
- <script src="script.js" defer></script>
+<!--  <script src="config.js" defer></script> -->
+ <script type="module" src="script.js" defer></script>
 </head>
 <body>
   <header>
-    <h1>Nyhetsaggregator</h1>
+    <h1>Topp-Nyhetsaggregator</h1>
   </header>
   <main>
     <section class="search-section">
@@ -18,19 +18,47 @@
       <button id="search-button">Sök</button>
     </section>
     
-    <section class="filter-section">
-      <label for="category-filter">Filtrera efter kategori:</label>
+    <form class="filter-section">
+      <label for="category-filter">Utforska toppnyheter efter kategori:</label>
       <select id="category-filter">
-        <option value="all">Alla</option>
+        <option value="general">Allmänt</option>
         <option value="technology">Teknik</option>
         <option value="sports">Sport</option>
-        <option value="economy">Ekonomi</option>
-        <!-- Lägg till fler kategorier baserat på API -->
+        <option value="science">Vetenskap</option>
+        <option value="health">Hälsa</option>
+        <option value="entertainment">Sport</option>
+        <option value="business">Ekonomi</option>
       </select>
-    </section>
+    </form>
 
     <section class="news-section" id="news-section">
-      <p>Dynamiskt laddade nyhetsartiklar</p>
+      <ul class="news-list" id="news-list">
+       <li class="news-item">
+        <h2 class="news-title">Nyhetstitel</h2>
+        <p class="news-description">Nyhetstext</p>
+        <small class="news-source">Nyhetkalla</small>
+        <small class="news-date">Nyhetdatum</small>
+       </li>
+       <li class="news-item">
+        <h2 class="news-title">Nyhetstitel</h2>
+        <p class="news-description">Nyhetstext</p>
+        <small class="news-source">Nyhetkalla</small>
+        <small class="news-date">Nyhetdatum</small>
+       </li>
+       <li class="news-item">
+        <h2 class="news-title">Nyhetstitel</h2>
+        <p class="news-description">Nyhetstext</p>
+        <small class="news-source">Nyhetkalla</small>
+        <small class="news-date">Nyhetdatum</small>
+       </li>
+       <li class="news-item">
+        <h2 class="news-title">Nyhetstitel</h2>
+        <p class="news-description">Nyhetstext</p>
+        <small class="news-source">Nyhetkalla</small>
+        <small class="news-date">Nyhetdatum</small>
+       </li>
+      
+      </ul>
     </section>
 
     <section class="pagination-section">
@@ -40,8 +68,8 @@
     </section>
   </main>
   <footer>
-    <p>Utvecklat av Grupp [Gruppnamn]</p>
+    <p>Team Göteborg &copy; 2024 </p>
   </footer>
-  
+
 </body>
 </html>
