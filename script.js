@@ -33,24 +33,25 @@ async function fetchNews(url) {
     }
 }
 
+ function formatDate(publishedAt) {
+    if (!publishedAt) return "Okänt datum"; // Fallback om datum saknas
 
-// Funktion för att formatera timestamp (svenskt datumformat utan sekunder)
-//! kolla så paramertern stämmer
-function formatDate(publishedAt) {
- const date = new Date(publishedAt);
- const options = {
-   weekday: 'short',
-   year: 'numeric',
-   month: 'short',
-   day: 'numeric',
-   hour: 'numeric',
-   minute: 'numeric',
-   hour12: false
- };
- return date.toLocaleString('sv-SE', options);
+    const date = new Date(publishedAt);
+
+    // Kontrollera om datumet är giltigt
+    if (isNaN(date.getTime())) return "Okänt datum";
+
+    const options = {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false
+    };
+    return date.toLocaleString('sv-SE', options);
 }
-
-
 
 
 function searchNews() {
@@ -64,32 +65,51 @@ function searchNews() {
     return url; // returns url
 }
 
+//uppdaterad function för att ta bort removed articles och invalid dates
+
 function displayNews(data) {
     console.log(newsList);
     
     newsList.innerHTML = ""; // Clear existing news items
 
-    const title = data.title; // replace with actual input
-    const description = data.description;  
-    const source = data.name;
-  /*   const date = formatDate(data.publishedAt); //data.articles.publishedAt; */
+  const validArticles = data.filter(article => {
+    const isValid = 
+        article.title && 
+        article.description && 
+        article.publishedAt && 
+        article.url && 
+        !article.title.includes("[Removed]") && 
+        !article.description.includes("[Removed]") && 
+        !(article.source && article.source.name && article.source.name.includes("[Removed]"));
+    
+    if (!isValid) {
+        console.warn("Ogiltig eller borttagen artikel ignorerad:", article);
+    }
+    return isValid;
+});
 
-    createNewsElement( // calls function to create new element based on input values
-      title,
-      description,
-      source
-     /*  date */
-    );
-
-    data.forEach((article) => { 
-      createNewsElement(
-        article.title,
-        article.description,
-        article.source.name,
-        article.publishedAt,
-        article.url
-      );
+    validArticles.forEach((article) => { 
+        createNewsElement(
+            article.title,
+            article.description,
+            article.source.name,
+            article.publishedAt,
+            article.url
+        );
     });
+
+    if (validArticles.length === 0) {
+        const noNewsMessage = document.createElement("p");
+        noNewsMessage.textContent = "Inga artiklar kunde hämtas.";
+        newsList.appendChild(noNewsMessage);
+    }
+
+    if (data.length === 0) {
+        const noResultsMessage = document.createElement("p");
+        noResultsMessage.textContent = "Inga nyheter hittades för din sökning.";
+        newsList.appendChild(noResultsMessage);
+        return;
+    }
 
 }
 
@@ -113,6 +133,7 @@ function displayNews(data) {
     newsDate.classList.add("news-date");
     newsDate.textContent = formatDate(date);
 
+    //lagt till läs mer knapp
     const readMoreButton = document.createElement("a");
     readMoreButton.classList.add("read-more");
     readMoreButton.textContent = "Läs mer";
