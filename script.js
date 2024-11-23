@@ -9,12 +9,6 @@ const newsList = document.getElementById("news-list"); // ul element
 
 async function fetchNews(url) {
     try {
-        /* const url = new URL(BASE_URL);
-        /* url.searchParams.append('country', country); */
-        /* url.searchParams.append('category', category);
-        url.searchParams.append('query', query);
-        url.searchParams.append('apiKey', API_KEY); */
-
         // Gör en GET-förfrågan
         const response = await fetch(url);
 
@@ -39,9 +33,6 @@ async function fetchNews(url) {
     }
 }
 
-
-
-/* console.log(`API Key: ${API_KEY}`); */
 
 // Funktion för att formatera timestamp (svenskt datumformat utan sekunder)
 //! kolla så paramertern stämmer
@@ -94,14 +85,15 @@ function displayNews(data) {
       createNewsElement(
         article.title,
         article.description,
-        article.source.name
-        /* article.publishedAt */
+        article.source.name,
+        article.publishedAt,
+        article.url
       );
     });
 
 }
 
-  function createNewsElement(title, description, source, date) {
+  function createNewsElement(title, description, source, date, url) {
     const newsItem = document.createElement("li");
     newsItem.classList.add("news-item");
   
@@ -120,11 +112,19 @@ function displayNews(data) {
     const newsDate = document.createElement("small");
     newsDate.classList.add("news-date");
     newsDate.textContent = formatDate(date);
+
+    const readMoreButton = document.createElement("a");
+    readMoreButton.classList.add("read-more");
+    readMoreButton.textContent = "Läs mer";
+    readMoreButton.href = url;
+    readMoreButton.target = "_blank"; 
+    readMoreButton.rel = "noopener noreferrer"; 
   
     newsItem.appendChild(newsTitle);
     newsItem.appendChild(newsDescription);
     newsItem.appendChild(newsSource);
     newsItem.appendChild(newsDate);
+    newsItem.appendChild(readMoreButton);
   
     newsList.appendChild(newsItem);
 }
