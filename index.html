@@ -10,7 +10,7 @@
 </head>
 <body>
   <header>
-    <h1>Nyhetsaggregator</h1>
+    <h1>Browse Top News</h1>
   </header>
   <main>
     <section class="search-section">
@@ -20,7 +20,8 @@
     
     <form class="filter-section">
       <label for="category-filter">Utforska toppnyheter efter kategori:</label>
-      <select id="category-filter">
+      <select id="category-filter" name="category-filter">
+        <option value="" disabled selected>Välj kategori</option>
         <option value="general">Allmänt</option>
         <option value="technology">Teknik</option>
         <option value="sports">Sport</option>
@@ -71,5 +72,21 @@
     <p>Team Göteborg &copy; 2024 </p>
   </footer>
 
+  <!-- Modal -->
+  <div id="moreInfoModal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <button class="modal-close-button">&times;</button>
+      <h2 id="modal-title">Loading...</h2>
+      <p id="modal-description"></p>
+      <p id="modal-content"></p> <!-- New field for the 'content' -->
+      <a id="modal-url" href="#" target="_blank">Read the full article here</a>
+      <p id="modal-source"></p>
+      <p id="modal-date"></p>
+    </div>
+  </div>
+
 </body>
+
+
 </html>
