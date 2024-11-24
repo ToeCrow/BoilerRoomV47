@@ -2,17 +2,36 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f8f8f7;
+    background-color: #051827;
     color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
-
+main {
+    padding: 20px, 2.5rem;    /* Footer height */
+}
 header {
-    background-color: #0b2332;
-    color: white;
+    background-image: url(https://png.pngtree.com/thumb_back/fh260/background/20210923/pngtree-news-red-and-blue-stripe-tv-background-image_902549.png);
+    background-size: cover;
     padding: 10px 20px;
     text-align: center;
+    height: 17rem;
+    display: grid;
+    align-content: center;
+    border-radius: 0px 0px 5px 5px;
+    
+    
 }
 
+h1 {
+    font-size: 6rem;
+    margin: 0;
+    font-family: fantasy;
+    color: #b63d3d;
+    font-style: italic;
+    font-variant: small-caps;
+}
 main {
     padding: 20px;
 }
@@ -27,11 +46,13 @@ main {
 input, select, button {
     padding: 10px;
     font-size: 16px;
+    border-radius: 25px;
+
 }
 
 button {
     cursor: pointer;
-    background-color: #0b2332;
+    background-color: #618da9;
     color: white;
     border: none;
     border-radius: 4px;
@@ -47,11 +68,22 @@ button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
-
+label {
+    margin-top: 10px;
+    color: #fff;
+    font-size: larger;
+}
 .news-section {
     gap: 20px;
+    display: grid;
 }
-
+.error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: lighter;
+    font-family: monospace;
+}
 .news-list {
     list-style: none;
     padding: 0;
@@ -59,17 +91,17 @@ button:disabled {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     grid-gap: 20px;
+    align-items: stretch;
 }
 
 .news-item {
-    background-color: white;
+    background-color: rgb(188, 216, 233);
     padding: 15px 0 0 0;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     width: 300px;
     margin: .75rem;
-    position: relative;
     display: grid;
     grid-template-rows: auto auto 1fr 1fr;
     grid-template-columns: 1fr 2fr;
@@ -141,7 +173,7 @@ button:disabled {
 }
 
 .pagination-section {
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     gap: 10px;
@@ -160,7 +192,9 @@ button:disabled {
     text-decoration: none;
     transition: background-color 0.3s ease;
 }
-
+.read-more:hover {
+    background-color: #931d1d;
+}
 /**** Modal ****/
 .modal {
     position: fixed;
@@ -182,9 +216,10 @@ button:disabled {
 }
 
 .modal-content {
-    background: white;
+    background: rgb(188, 216, 233);
     padding: 20px;
     border-radius: 8px;
+    border:3px solid #102e42;
     width: 90%;
     max-width: 600px;
     position: relative;
@@ -258,3 +293,11 @@ button:disabled {
     height: auto;
 }
 
+footer {
+    padding: 2rem;
+    margin-top: auto;
+    width: 100%;
+    height: 4rem;
+    text-align: center;
+    color: #fff;
+}
