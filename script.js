@@ -298,6 +298,7 @@ function createInfoModal(article) {
 searchButton.addEventListener("click", () => {
     
     const url = searchNews();
+
     
     console.log("url: ", url);
     // returns url for search
@@ -312,11 +313,14 @@ searchButton.addEventListener("click", () => {
   const categoryFilter = document.getElementById("category-filter");
   categoryFilter.addEventListener("change", filterNews);
   function filterNews(event) {
+
+    // clear input field
+    searchInput.value = "";
   
-  const selectedCategory = event.target.value;
-  let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
+    const selectedCategory = event.target.value;
+    let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
   
-  fetchNews(filteredFetch);
-  console.log("filteredFetch: ", filteredFetch);
-  return filteredFetch
+    fetchNews(filteredFetch);
+    console.log("filteredFetch: ", filteredFetch);
+    return filteredFetch
   };
