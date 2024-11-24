@@ -234,6 +234,14 @@ function createInfoModal(article) {
     ? article.content.split(" [+")[0] // Remove everything after " [+"
     : "No additional content available.";
 
+    if (article.content === null) {
+        article.content = "No additional content available.";
+    }
+
+    if (article.description === null) {
+        article.description = "No description available.";
+    }
+
     // If the first 10 words of content and description are the same, remove the description
     const contentWords = article.content.split(/\s+/).slice(0, 10).join(" ");
     const descriptionWords = article.description.split(/\s+/).slice(0, 10).join(" ");
@@ -251,6 +259,15 @@ function createInfoModal(article) {
 
     // Show the modal
     modal.classList.remove("hidden");
+
+    const modalCloseButton = document.createElement("button");
+    modalCloseButton.classList.add("modal-close-button");
+    modalCloseButton.textContent = "X";
+    modalCloseButton.addEventListener("click", () => {
+        modal.classList.add("hidden");
+    });
+    modal.appendChild(modalCloseButton);
+
 
     // Close modal on overlay click or button click
     const overlay = modal.querySelector(".modal-overlay");
