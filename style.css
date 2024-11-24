@@ -91,7 +91,7 @@ button:disabled {
 
 .news-item h2 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
 }
 
 .news-title {
@@ -104,6 +104,7 @@ button:disabled {
     -webkit-box-orient: vertical;
     position: relative;
 }
+
 
 .news-date {
     grid-area: date;
@@ -200,6 +201,7 @@ button:disabled {
     cursor: pointer;
     color: #979797;
 }
+
 .modal-close-button:hover {
     color: #555;
     background-color: white;
@@ -215,7 +217,7 @@ button:disabled {
 
 #modal-title {
     font-size: 1.5rem;
-    margin-top: 7%;
+    margin-top: 2%;
     margin-bottom: 0;
 }
 
@@ -230,6 +232,17 @@ button:disabled {
     margin-bottom: 4%;  
     right: 4%;
 }
+
+#modal-content {
+    margin-top: 2%;
+}
+
+#modal-source, #modal-date {
+    font-style: italic;
+    color: #686868;
+    font-size: 0.8rem;
+}
+
 
 #modal-url {
     color: #007acc;
