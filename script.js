@@ -140,25 +140,24 @@ function searchNews() {
 //uppdaterad function för att ta bort removed articles och invalid dates
 
 function displayNews(data) {
-    console.log(newsList);
-    
     newsList.innerHTML = ""; // Clear existing news items
 
-  const validArticles = data.filter(article => {
-    const isValid = 
-        article.title && 
-        article.description && 
-        article.publishedAt && 
-        article.url && 
-        !article.title.includes("[Removed]") && 
-        !article.description.includes("[Removed]") && 
-        !(article.source && article.source.name && article.source.name.includes("[Removed]"));
-    
-    if (!isValid) {
-        console.warn("Ogiltig eller borttagen artikel ignorerad:", article);
-    }
-    return isValid;
-});
+    const validArticles = data.filter(article => {
+        const isValid = 
+            article.title && 
+            article.description && 
+            article.publishedAt && 
+            article.url && 
+           /*  article.content && // Ensure content exists */
+            !article.title.includes("[Removed]") && 
+            !article.description.includes("[Removed]") && 
+            !(article.source && article.source.name && article.source.name.includes("[Removed]"));
+
+        if (!isValid) {
+            console.warn("Invalid or removed article ignored:", article);
+        }
+        return isValid;
+    });
 
     validArticles.forEach((article) => { 
         createNewsElement(
@@ -166,26 +165,20 @@ function displayNews(data) {
             article.description,
             article.source.name,
             article.publishedAt,
-            article.url
+            article.url,
+            article.content // Pass content only to the modal
         );
     });
 
     if (validArticles.length === 0) {
         const noNewsMessage = document.createElement("p");
-        noNewsMessage.textContent = "Inga artiklar kunde hämtas.";
+        noNewsMessage.textContent = "No articles could be retrieved.";
         newsList.appendChild(noNewsMessage);
     }
-
-    if (data.length === 0) {
-        const noResultsMessage = document.createElement("p");
-        noResultsMessage.textContent = "Inga nyheter hittades för din sökning.";
-        newsList.appendChild(noResultsMessage);
-        return;
-    }
-
 }
 
-  function createNewsElement(title, description, source, date, url) {
+
+  function createNewsElement(title, description, source, date, url, content) {
     const newsItem = document.createElement("li");
     newsItem.classList.add("news-item");
   
@@ -206,12 +199,23 @@ function displayNews(data) {
     newsDate.textContent = formatDate(date);
 
     //lagt till läs mer knapp
-    const readMoreButton = document.createElement("a");
+    const readMoreButton = document.createElement("button");
     readMoreButton.classList.add("read-more");
-    readMoreButton.textContent = "Läs mer";
-    readMoreButton.href = url;
-    readMoreButton.target = "_blank"; 
-    readMoreButton.rel = "noopener noreferrer"; 
+    readMoreButton.textContent = "Read more";
+    readMoreButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        // Pass the content to the modal when "Read More" is clicked
+        createInfoModal({
+            title: title,
+            description: description,
+            content: content, // Content passed to modal
+            source: source,
+            date: date,
+            url: url
+        });
+    });
+
+
   
     newsItem.appendChild(newsTitle);
     newsItem.appendChild(newsDescription);
@@ -221,6 +225,46 @@ function displayNews(data) {
   
     newsList.appendChild(newsItem);
 }
+
+function createInfoModal(article) {
+    const modal = document.getElementById("moreInfoModal");
+
+    // Clean up the content
+    const cleanedContent = article.content
+    ? article.content.split(" [+")[0] // Remove everything after " [+"
+    : "No additional content available.";
+
+    // If the first 10 words of content and description are the same, remove the description
+    const contentWords = article.content.split(/\s+/).slice(0, 10).join(" ");
+    const descriptionWords = article.description.split(/\s+/).slice(0, 10).join(" ");
+    if (contentWords === descriptionWords) {
+        article.description = "";
+    }
+
+    // Populate modal with article details
+    document.getElementById("modal-title").textContent = article.title;
+    document.getElementById("modal-description").textContent = article.description || "No description available."; // Display description
+    document.getElementById("modal-content").textContent = cleanedContent; // Display cleaned content
+    document.getElementById("modal-source").textContent = `Source: ${article.source}`;
+    document.getElementById("modal-date").textContent = `Published: ${formatDate(article.date)}`;
+    document.getElementById("modal-url").href = article.url;
+
+    // Show the modal
+    modal.classList.remove("hidden");
+
+    // Close modal on overlay click or button click
+    const overlay = modal.querySelector(".modal-overlay");
+    const closeButton = modal.querySelector(".modal-close-button");
+
+    function closeModal() {
+        modal.classList.add("hidden");
+    }
+
+    overlay.addEventListener("click", closeModal);
+    closeButton.addEventListener("click", closeModal);
+}
+
+  
 
 // SEARCH NEWS function which returns url for fetch
 

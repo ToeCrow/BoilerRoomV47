@@ -10,7 +10,7 @@
 </head>
 <body>
   <header>
-    <h1>Topp-Nyhetsaggregator</h1>
+    <h1>Browse Top News</h1>
   </header>
   <main>
     <section class="search-section">
@@ -72,7 +72,21 @@
     <p>Team Göteborg &copy; 2024 </p>
   </footer>
 
+  <!-- Modal -->
+  <div id="moreInfoModal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <button class="modal-close-button">&times;</button>
+      <h2 id="modal-title">Loading...</h2>
+      <p id="modal-description"></p>
+      <p id="modal-content"></p> <!-- New field for the 'content' -->
+      <a id="modal-url" href="#" target="_blank">Read the full article here</a>
+      <p id="modal-source"></p>
+      <p id="modal-date"></p>
+    </div>
+  </div>
+
 </body>
 
-<div role="information" id="moreInfoPopover" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="auto" data-bs-content="Here you can see more information about the article."></div>
+
 </html>
