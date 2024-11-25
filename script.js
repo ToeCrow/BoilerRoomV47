@@ -21,27 +21,27 @@ async function fetchNews(url) {
 
             switch (response.status) {
                 case 400:
-                    errorMessage.textContent = "Ogiltig begäran (400). Kontrollera din input.";
+                    errorMessage.textContent = "Invalid request (400). Check your input.";
                     break;
                     
                 case 401:
-                    errorMessage.textContent = "Obehörig åtkomst (401). Kontrollera din API-nyckel.";
+                    errorMessage.textContent = "Unauthorized access (401). Check your API key.";
                     break;
                     
                 case 404:
-                    errorMessage.textContent = "Resursen kunde inte hittas (404).";
+                    errorMessage.textContent = "Resource not found (404).";
                     break;
                     
                 case 429:
-                    errorMessage.textContent = "För många förfrågningar (429). Försök igen senare.";
+                    errorMessage.textContent = "Too many requests (429). Try again later.";
                     break;
                     
                 case 500:
-                    errorMessage.textContent = "Serverfel (500). Försök igen senare.";
+                    errorMessage.textContent = "Server error (500). Try again later.";
                     break;
                     
                 default:
-                    errorMessage.textContent = `Okänt fel (${response.status}).`;
+                    errorMessage.textContent = `Unknown error (${response.status}).`;
                     
             }
 
@@ -56,14 +56,14 @@ async function fetchNews(url) {
 
         // Hantera fall där API returnerar tomma resultat
         if (!data.articles || data.articles.length === 0) {
-            console.log("Inga resultat hittades för din sökfråga");
+            console.log("No results found for your search query.");
             
             newsList.innerHTML = ""; // Clear existing news items
 
             const emptyMessage = document.createElement("p");
-            emptyMessage.textContent = "Inga nyheter hittades.";
+            emptyMessage.textContent = "No news found.";
             newsList.appendChild(emptyMessage);
-            return "Inga resultat hittades för din sökfråga.";
+            return "No results found for your search query.";
         }
 
 
@@ -78,7 +78,7 @@ async function fetchNews(url) {
 
     } catch (error) {
         // Logga felet för utveckling eller visa användarvänligt felmeddelande
-        console.error("Ett fel inträffade:", error.message);
+        console.error("An error occurred:", error.message);
         return error.message;
     }
 }
@@ -118,12 +118,12 @@ document.getElementById("next-page").addEventListener("click", () => {
 
     //uppdaterat formatdate
  function formatDate(publishedAt) {
-    if (!publishedAt) return "Okänt datum"; // Fallback om datum saknas
+    if (!publishedAt) return "Unknown date"; // Fallback om datum saknas
 
     const date = new Date(publishedAt);
 
     // Kontrollera om datumet är giltigt
-    if (isNaN(date.getTime())) return "Okänt datum";
+    if (isNaN(date.getTime())) return "Unknown date";
 
     const options = {
         weekday: 'short',
@@ -134,18 +134,18 @@ document.getElementById("next-page").addEventListener("click", () => {
         minute: 'numeric',
         hour12: false
     };
-    return date.toLocaleString('sv-SE', options);
+    return date.toLocaleString('en-GB', options);
 }
 
 
 function searchNews() {
     const query = "q=" + searchInput.value.trim() + "&";
     if (searchInput.value.trim() === "") {
-        console.log("Sökfrågan kan inte vara tom. Ange ett giltigt sökord.");
-        return "Sökfrågan kan inte vara tom. Ange ett giltigt sökord.";
+        console.log("The search query cannot be empty. Please enter a valid keyword.");
+        return "The search query cannot be empty. Please enter a valid keyword.";
     }
     // const skip =  (currentPage - 1) * pageSize;
-    const url = `https://newsapi.org/v2/top-headlines?${query}apiKey=${apiKey}`;    
+    const url = `https://newsapi.org/v2/top-headlines?${query}language=en&apiKey=${apiKey}`;    
     // `https://newsapi.org/v2/top-headlines?limit=${pageSize}&skip=${skip}&${query}apiKey=${apiKey}`
     console.log("url som returneras: ", url);
     return url; // returns url
