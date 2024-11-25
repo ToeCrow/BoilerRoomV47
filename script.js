@@ -222,7 +222,6 @@ function displayNews(data) {
 
     //lagt till läs mer knapp
     const readMoreButton = document.createElement("a");
-    const readMoreButton = document.createElement("a");
     readMoreButton.classList.add("read-more");
     readMoreButton.textContent = "Läs mer";
     readMoreButton.href = url;
