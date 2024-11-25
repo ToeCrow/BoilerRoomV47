@@ -181,7 +181,13 @@ function displayNews(data) {
             article.description,
             article.source.name,
             article.publishedAt,
+<<<<<<< HEAD
             article.url
+=======
+            article.url,
+            article.content, // Pass content only to the modal
+            article.urlToImage // Pass content only to the modal
+>>>>>>> 656ca96 (fixed lost merge code)
         );
     });
 
@@ -200,7 +206,12 @@ function displayNews(data) {
 
 }
 
+<<<<<<< HEAD
   function createNewsElement(title, description, source, date, url) {
+=======
+
+  function createNewsElement(title, description, source, date, url, content, urlToImage) {
+>>>>>>> 656ca96 (fixed lost merge code)
     const newsItem = document.createElement("li");
     newsItem.classList.add("news-item");
   
@@ -223,10 +234,30 @@ function displayNews(data) {
     //lagt till läs mer knapp
     const readMoreButton = document.createElement("a");
     readMoreButton.classList.add("read-more");
+<<<<<<< HEAD
     readMoreButton.textContent = "Läs mer";
     readMoreButton.href = url;
     readMoreButton.target = "_blank"; 
     readMoreButton.rel = "noopener noreferrer"; 
+=======
+    readMoreButton.textContent = "Read more";
+    readMoreButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        // Pass the content to the modal when "Read More" is clicked
+        createInfoModal({
+            title: title,
+            description: description,
+            content: content, // Content passed to modal
+            source: source,
+            date: date,
+            url: url,
+            urlToImage: urlToImage
+            
+        });
+    });
+
+
+>>>>>>> 656ca96 (fixed lost merge code)
   
     newsItem.appendChild(newsTitle);
     newsItem.appendChild(newsDescription);
@@ -237,6 +268,60 @@ function displayNews(data) {
     newsList.appendChild(newsItem);
 }
 
+<<<<<<< HEAD
+=======
+function createInfoModal(article) {
+    const modal = document.getElementById("moreInfoModal");
+
+    // Clean up the content
+    const cleanedContent = article.content.split(" [+")[0]; // Remove everything after " [+"
+
+    // If the first 10 words of content and description are the same, remove the description
+    const contentWords = article.content.split(/\s+/).slice(0, 10).join(" ");
+    const descriptionWords = article.description.split(/\s+/).slice(0, 10).join(" ");
+    if (contentWords === descriptionWords) {
+        article.description = "";
+    }
+
+    // Populate modal with article details
+    document.getElementById("modal-title").textContent = article.title;
+    document.getElementById("modal-description").textContent = article.description || "No description available."; // Display description
+    document.getElementById("modal-content").textContent = cleanedContent; // Display cleaned content
+    document.getElementById("modal-source").textContent = `Source: ${article.source}`;
+    document.getElementById("modal-date").textContent = `Published: ${formatDate(article.date)}`;
+    document.getElementById("modal-url").href = article.url;
+    document.getElementById("modal-image").src = article.urlToImage;    
+
+    console.log("url to image:", article.urlToImage);
+    // Show the modal
+    modal.classList.remove("hidden");
+
+        /* const modalCloseButton = document.createElement("button");
+    modalCloseButton.classList.add("modal-close-button");
+    modalCloseButton.textContent = "X";
+    modalCloseButton.addEventListener("click", () => {
+        modal.classList.add("hidden");
+    });
+    modal.appendChild(modalCloseButton); */
+
+
+    // Close modal on overlay click or button click
+    const overlay = modal.querySelector(".modal-overlay");
+    const closeButton = modal.querySelector(".modal-close-button");
+    const closeBtn = document.getElementById("close-modal");
+
+    function closeModal() {
+        modal.classList.add("hidden");
+    }
+
+    overlay.addEventListener("click", closeModal);
+    closeButton.addEventListener("click", closeModal);
+    closeBtn.addEventListener("click", closeModal);
+}
+
+  
+
+>>>>>>> 656ca96 (fixed lost merge code)
 // SEARCH NEWS function which returns url for fetch
 
 
