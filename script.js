@@ -2,32 +2,9 @@
 import { API_KEY } from "./config.js";
 const apiKey = API_KEY;
 //lägg in url du vill hämta data från
-const BASE_URL = 'https://newsapi.org/v2/top-headlines';
 const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsList = document.getElementById("news-list"); // ul element
-
-
-// async function fetchData(apiUrl, userQuery, apiKey) {
-//     // Validering av användarens sökinput
-    
-
-//     const url = `${apiUrl}?query=${encodeURIComponent(userQuery)}&apiKey=${apiKey}`;
-
-//     try {
-//         const response = await fetch(url);
-
-        
-
-//         const data = await response.json();
-
-        
-
-//         return data; // Returnera resultaten om allt fungerar
-//     } 
-// };
-
-
 
 async function fetchNews(url) {
     try {
@@ -42,27 +19,27 @@ async function fetchNews(url) {
 
             switch (response.status) {
                 case 400:
-                    errorMessage.textContent = "Ogiltig begäran (400). Kontrollera din input.";
+                    errorMessage.textContent = "invalid request (400). Control your URL.";
                     break;
                     
                 case 401:
-                    errorMessage.textContent = "Obehörig åtkomst (401). Kontrollera din API-nyckel.";
+                    errorMessage.textContent = "Unothorized access (401). Not a valid API key.";
                     break;
                     
                 case 404:
-                    errorMessage.textContent = "Resursen kunde inte hittas (404).";
+                    errorMessage.textContent = "Resource not found (404).";
                     break;
                     
                 case 429:
-                    errorMessage.textContent = "För många förfrågningar (429). Försök igen senare.";
+                    errorMessage.textContent = "Too many requests (429). Max requests is 1000 searches per day. Try again later.";
                     break;
                     
                 case 500:
-                    errorMessage.textContent = "Serverfel (500). Försök igen senare.";
+                    errorMessage.textContent = "Server error (500). Try again later.";
                     break;
                     
                 default:
-                    errorMessage.textContent = `Okänt fel (${response.status}).`;
+                    errorMessage.textContent = `Uknown error (${response.status}).`;
                     
             }
 
@@ -72,19 +49,19 @@ async function fetchNews(url) {
             throw new Error(errorMessage.textContent);
         }
 
-        // Parsar JSON-data
+        // Parse JSON-data
         const data = await response.json();
 
         // Hantera fall där API returnerar tomma resultat
         if (!data || !data.articles || data.articles.length === 0) {
-            console.log("Inga resultat hittades för din sökfråga");
+            console.log("No results found for your search.");
             
             newsList.innerHTML = ""; // Clear existing news items
 
             const emptyMessage = document.createElement("p");
             emptyMessage.textContent = "Inga nyheter hittades.";
             newsList.appendChild(emptyMessage);
-            return "Inga resultat hittades för din sökfråga.";
+            return "No results found for your search.";
         }
 
 
@@ -98,19 +75,19 @@ async function fetchNews(url) {
 
     } catch (error) {
         // Logga felet för utveckling eller visa användarvänligt felmeddelande
-        console.error("Ett fel inträffade:", error.message);
+        console.error("An error occurred:", error.message);
         return error.message;
     }
 }
 
     //uppdaterat formatdate
  function formatDate(publishedAt) {
-    if (!publishedAt) return "Okänt datum"; // Fallback om datum saknas
+    if (!publishedAt) return "Uknown date"; // Fallback om datum saknas
 
     const date = new Date(publishedAt);
 
     // Kontrollera om datumet är giltigt
-    if (isNaN(date.getTime())) return "Okänt datum";
+    if (isNaN(date.getTime())) return "Uknown date";
 
     const options = {
         weekday: 'short',
@@ -121,7 +98,7 @@ async function fetchNews(url) {
         minute: 'numeric',
         hour12: false
     };
-    return date.toLocaleString('sv-SE', options);
+    return date.toLocaleString('en-SE', options);
 }
 
 function cleanInput(input) {
@@ -133,10 +110,10 @@ function searchNews() {
   const cleanedQuery = cleanInput(searchInput.value);
 
   if (cleanedQuery === "") {
-      console.log("Sökfrågan kan inte vara tom eller endast specialtecken. Ange ett giltigt sökord.");
+      console.log("Search bar is empty or contains only special characters. Write a valid search term.");
       newsList.innerHTML = "";
       const emptyMessage = document.createElement("p");
-            emptyMessage.textContent = "Sökfrågan kan inte vara tom eller endast specialtecken. Ange ett giltigt sökord.";
+            emptyMessage.textContent = "Search bar is empty or contains only special characters. Write a valid search term.";
             emptyMessage.classList.add("error-message");
             newsList.appendChild(emptyMessage);
             
@@ -148,7 +125,7 @@ function searchNews() {
     // const skip =  (currentPage - 1) * pageSize;
     const url = `https://newsapi.org/v2/top-headlines?${query}apiKey=${apiKey}`;    
     // `https://newsapi.org/v2/top-headlines?limit=${pageSize}&skip=${skip}&${query}apiKey=${apiKey}`
-    console.log("url som returneras: ", url);
+    console.log("url that is returned: ", url);
     return url; // returns url
 }
 
@@ -328,7 +305,7 @@ searchButton.addEventListener("click", () => {
   categoryFilter.addEventListener("change", filterNews);
   function filterNews(event) {
 
-      currentPage = 1; // Reset to the first page
+    //   currentPage = 1; // Reset to the first page
   const selectedCategory = event.target.value;
     let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
     fetchNews(filteredFetch);
