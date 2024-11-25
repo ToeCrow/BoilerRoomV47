@@ -1,17 +1,17 @@
 // script.js
 import { API_KEY } from "./config.js";
 const apiKey = API_KEY;
-//lägg in url du vill hämta data från
+// Add the url you want to retrieve data from
 const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsList = document.getElementById("news-list"); // ul element
 
 async function fetchNews(url) {
     try {
-        // Gör en GET-förfrågan
+        // GET-request
         const response = await fetch(url);
 
-        // Kontrollera HTTP-statuskoder
+        // Controlling fetching errors
 
         if (!response.ok) {
             const errorMessage = document.createElement("p");
@@ -52,14 +52,14 @@ async function fetchNews(url) {
         // Parse JSON-data
         const data = await response.json();
 
-        // Hantera fall där API returnerar tomma resultat
+        // Manage cases where API returns no results
         if (!data || !data.articles || data.articles.length === 0) {
             console.log("No results found for your search.");
             
             newsList.innerHTML = ""; // Clear existing news items
 
             const emptyMessage = document.createElement("p");
-            emptyMessage.textContent = "Inga nyheter hittades.";
+            emptyMessage.textContent = "No results found for your search";
             newsList.appendChild(emptyMessage);
             return "No results found for your search.";
         }
@@ -74,19 +74,19 @@ async function fetchNews(url) {
         
 
     } catch (error) {
-        // Logga felet för utveckling eller visa användarvänligt felmeddelande
+        // Log the error for development or show user-friendly error message
         console.error("An error occurred:", error.message);
         return error.message;
     }
 }
 
-    //uppdaterat formatdate
+    //uppdate formatdate
  function formatDate(publishedAt) {
-    if (!publishedAt) return "Uknown date"; // Fallback om datum saknas
+    if (!publishedAt) return "Uknown date"; // Fallback if date is missing
 
     const date = new Date(publishedAt);
 
-    // Kontrollera om datumet är giltigt
+    // Controlls if date is valid
     if (isNaN(date.getTime())) return "Uknown date";
 
     const options = {
@@ -122,14 +122,12 @@ function searchNews() {
   
   const query = `q=${cleanedQuery}&`;
     
-    // const skip =  (currentPage - 1) * pageSize;
     const url = `https://newsapi.org/v2/top-headlines?${query}apiKey=${apiKey}`;    
-    // `https://newsapi.org/v2/top-headlines?limit=${pageSize}&skip=${skip}&${query}apiKey=${apiKey}`
     console.log("url that is returned: ", url);
     return url; // returns url
 }
 
-//uppdaterad function för att ta bort removed articles och invalid dates
+//updated function to remove "removed" articles and invalid dates
 
 function displayNews(data) {
     console.log(newsList);
@@ -166,13 +164,13 @@ function displayNews(data) {
 
     if (validArticles.length === 0) {
         const noNewsMessage = document.createElement("p");
-        noNewsMessage.textContent = "Inga artiklar kunde hämtas.";
+        noNewsMessage.textContent = "No news could be found.";
         newsList.appendChild(noNewsMessage);
     }
 
     if (data.length === 0) {
         const noResultsMessage = document.createElement("p");
-        noResultsMessage.textContent = "Inga nyheter hittades för din sökning.";
+        noResultsMessage.textContent = "No news found for your search.";
         newsList.appendChild(noResultsMessage);
         return;
     }
@@ -200,7 +198,7 @@ function displayNews(data) {
     newsDate.classList.add("news-date");
     newsDate.textContent = formatDate(date);
 
-    //lagt till läs mer knapp
+    //Add "Read More" button
     const readMoreButton = document.createElement("a");
     readMoreButton.classList.add("read-more");
     readMoreButton.textContent = "Read more";
@@ -256,15 +254,6 @@ function createInfoModal(article) {
     // Show the modal
     modal.classList.remove("hidden");
 
-        /* const modalCloseButton = document.createElement("button");
-    modalCloseButton.classList.add("modal-close-button");
-    modalCloseButton.textContent = "X";
-    modalCloseButton.addEventListener("click", () => {
-        modal.classList.add("hidden");
-    });
-    modal.appendChild(modalCloseButton); */
-
-
     // Close modal on overlay click or button click
     const overlay = modal.querySelector(".modal-overlay");
     const closeButton = modal.querySelector(".modal-close-button");
@@ -279,8 +268,6 @@ function createInfoModal(article) {
     closeBtn.addEventListener("click", closeModal);
 }
 
-  
-
 // SEARCH NEWS function which returns url for fetch
 
 
@@ -290,7 +277,7 @@ searchButton.addEventListener("click", () => {
     const url = searchNews();
     
     if (!url) {
-      console.log("Ingen giltig URL att hämta data från.");
+      console.log("No valid URL to fetch data from.");
       return; // Stops if no valid URL
     }  
 
