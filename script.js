@@ -186,7 +186,8 @@ function displayNews(data) {
             article.source.name,
             article.publishedAt,
             article.url,
-            article.content // Pass content only to the modal
+            article.content, // Pass content only to the modal
+            article.urlToImage // Pass content only to the modal
         );
     });
 
@@ -198,7 +199,7 @@ function displayNews(data) {
 }
 
 
-  function createNewsElement(title, description, source, date, url, content) {
+  function createNewsElement(title, description, source, date, url, content, urlToImage) {
     const newsItem = document.createElement("li");
     newsItem.classList.add("news-item");
   
@@ -231,7 +232,9 @@ function displayNews(data) {
             content: content, // Content passed to modal
             source: source,
             date: date,
-            url: url
+            url: url,
+            urlToImage: urlToImage
+            
         });
     });
 
@@ -249,9 +252,7 @@ function createInfoModal(article) {
     const modal = document.getElementById("moreInfoModal");
 
     // Clean up the content
-    const cleanedContent = article.content
-    ? article.content.split(" [+")[0] // Remove everything after " [+"
-    : "No additional content available.";
+    const cleanedContent = article.content.split(" [+")[0]; // Remove everything after " [+"
 
     // If the first 10 words of content and description are the same, remove the description
     const contentWords = article.content.split(/\s+/).slice(0, 10).join(" ");
@@ -267,13 +268,25 @@ function createInfoModal(article) {
     document.getElementById("modal-source").textContent = `Source: ${article.source}`;
     document.getElementById("modal-date").textContent = `Published: ${formatDate(article.date)}`;
     document.getElementById("modal-url").href = article.url;
+    document.getElementById("modal-image").src = article.urlToImage;    
 
+    console.log("url to image:", article.urlToImage);
     // Show the modal
     modal.classList.remove("hidden");
+
+        /* const modalCloseButton = document.createElement("button");
+    modalCloseButton.classList.add("modal-close-button");
+    modalCloseButton.textContent = "X";
+    modalCloseButton.addEventListener("click", () => {
+        modal.classList.add("hidden");
+    });
+    modal.appendChild(modalCloseButton); */
+
 
     // Close modal on overlay click or button click
     const overlay = modal.querySelector(".modal-overlay");
     const closeButton = modal.querySelector(".modal-close-button");
+    const closeBtn = document.getElementById("close-modal");
 
     function closeModal() {
         modal.classList.add("hidden");
@@ -281,6 +294,7 @@ function createInfoModal(article) {
 
     overlay.addEventListener("click", closeModal);
     closeButton.addEventListener("click", closeModal);
+    closeBtn.addEventListener("click", closeModal);
 }
 
   

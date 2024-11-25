@@ -249,3 +249,32 @@ footer {
     text-align: center;
     color: #fff;
 }
+
+
+#modal-title {
+  font-size: 1.5rem;
+  margin-top: 7%;
+  margin-bottom: 0;
+}
+
+#modal-description {
+  font-size: 1rem;
+  font-style: italic;
+}
+
+#close-modal {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 4%;  
+  right: 4%;
+}
+
+#modal-url {
+  color: #007acc;
+  text-decoration: none;
+}
+
+#modal-image {
+  width: 100%;
+  height: auto;
+}
