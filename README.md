@@ -38,3 +38,11 @@ Efter en välförtjänt rast.
 Ser vi över vad som fortfarande felar behövs och bestämmer att även lördag kommer vi köra för att få det att funka.
 Vi har lite fel meddelanden vi måste kolla över, samt köra igen.
 Det har med olika tankar om hur vi kör varit en utmaning att få fetchen att fungera som vi vill och enligt uppgiften.
+
+kort snack på lördag för att fördela det som var kvar
+
+måndag kl 10 fördela presentation och retro
+
+
+mina observationer är att ju mer komplex kod vi får, desto viktigare blir det att vi har samma vision, då det blir många rader som måste göras om med olika tänk.
+Svårt att vara för precis när vi har så ont om tid och kanske inte heller erfarenheten ännu att se problemen i förhand.
