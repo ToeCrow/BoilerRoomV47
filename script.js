@@ -1,33 +1,12 @@
 // script.js
 import { API_KEY } from "./config.js";
 const apiKey = API_KEY;
-//lägg in url du vill hämta data från
-const BASE_URL = 'https://newsapi.org/v2/top-headlines';
 const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsList = document.getElementById("news-list"); // ul element
 
-
-// async function fetchData(apiUrl, userQuery, apiKey) {
-//     // Validering av användarens sökinput
-    
-
-//     const url = `${apiUrl}?query=${encodeURIComponent(userQuery)}&apiKey=${apiKey}`;
-
-//     try {
-//         const response = await fetch(url);
-
-        
-
-//         const data = await response.json();
-
-        
-
-//         return data; // Returnera resultaten om allt fungerar
-//     } 
-// };
-
-
+let currentPage = 1; // Keeps track of the current page
+const pageSize = 9; // Amount of news items per page
 
 async function fetchNews(url) {
     try {
@@ -76,7 +55,7 @@ async function fetchNews(url) {
         const data = await response.json();
 
         // Hantera fall där API returnerar tomma resultat
-        if (!data || !data.articles || data.articles.length === 0) {
+        if (!data.articles || data.articles.length === 0) {
             console.log("Inga resultat hittades för din sökfråga");
             
             newsList.innerHTML = ""; // Clear existing news items
@@ -89,8 +68,9 @@ async function fetchNews(url) {
 
 
         displayNews(data.articles);
-        
-        console.log("fetchNews output inside: ", data.articles);
+        // Uppdate pagination based on API-results
+        updatePaginationButtons(data.totalResults);
+        console.log("fetchNews output: ", data.articles);
         
         return data.articles; //  returns articles as JS list
         
@@ -102,6 +82,39 @@ async function fetchNews(url) {
         return error.message;
     }
 }
+
+function updatePaginationButtons(totalResults) {
+    const totalPages = Math.ceil(totalResults / pageSize);
+    document.getElementById("current-page").textContent = currentPage;
+
+    const prevButton = document.getElementById("prev-page");
+    const nextButton = document.getElementById("next-page");
+    const paginationSection = document.querySelector(".pagination-section");
+
+    // Shows or hides pagination based on the amount of articles
+    // if (totalResults > pageSize) {
+    //     paginationSection.style.display = "flex"; // Visa pagination
+    // } else {
+    //     paginationSection.style.display = "none"; // Dölj pagination
+    // }
+    // Activate or deactivate pagination buttons based on current page
+    prevButton.disabled = currentPage <= 1;
+    nextButton.disabled = currentPage >= totalPages;
+
+}
+
+document.getElementById("prev-page").addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        fetchNews(searchNews()); // Use the current search
+    }
+});
+
+document.getElementById("next-page").addEventListener("click", () => {
+    currentPage++;
+    fetchNews(searchNews()); // Use the current search
+});
+
 
     //uppdaterat formatdate
  function formatDate(publishedAt) {
@@ -124,27 +137,13 @@ async function fetchNews(url) {
     return date.toLocaleString('sv-SE', options);
 }
 
-function cleanInput(input) {
-  return input.replace(/^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$/g, "").trim();
-}
 
 function searchNews() {
-
-  const cleanedQuery = cleanInput(searchInput.value);
-
-  if (cleanedQuery === "") {
-      console.log("Sökfrågan kan inte vara tom eller endast specialtecken. Ange ett giltigt sökord.");
-      newsList.innerHTML = "";
-      const emptyMessage = document.createElement("p");
-            emptyMessage.textContent = "Sökfrågan kan inte vara tom eller endast specialtecken. Ange ett giltigt sökord.";
-            emptyMessage.classList.add("error-message");
-            newsList.appendChild(emptyMessage);
-            
-      return null;
-  }
-  
-  const query = `q=${cleanedQuery}&`;
-    
+    const query = "q=" + searchInput.value.trim() + "&";
+    if (searchInput.value.trim() === "") {
+        console.log("Sökfrågan kan inte vara tom. Ange ett giltigt sökord.");
+        return "Sökfrågan kan inte vara tom. Ange ett giltigt sökord.";
+    }
     // const skip =  (currentPage - 1) * pageSize;
     const url = `https://newsapi.org/v2/top-headlines?${query}apiKey=${apiKey}`;    
     // `https://newsapi.org/v2/top-headlines?limit=${pageSize}&skip=${skip}&${query}apiKey=${apiKey}`
@@ -152,28 +151,33 @@ function searchNews() {
     return url; // returns url
 }
 
+function articleSkip(pageSize, currentPage) {
+
+    return (currentPage - 1) * pageSize;
+    
+}
+
 //uppdaterad function för att ta bort removed articles och invalid dates
 
 function displayNews(data) {
-    console.log(newsList);
-    
     newsList.innerHTML = ""; // Clear existing news items
 
-  const validArticles = data.filter(article => {
-    const isValid = 
-        article.title && 
-        article.description && 
-        article.publishedAt && 
-        article.url && 
-        !article.title.includes("[Removed]") && 
-        !article.description.includes("[Removed]") && 
-        !(article.source && article.source.name && article.source.name.includes("[Removed]"));
-    
-    if (!isValid) {
-        console.warn("Ogiltig eller borttagen artikel ignorerad:", article);
-    }
-    return isValid;
-});
+    const validArticles = data.filter(article => {
+        const isValid = 
+            article.title && 
+            article.description && 
+            article.publishedAt && 
+            article.url && 
+           /*  article.content && // Ensure content exists */
+            !article.title.includes("[Removed]") && 
+            !article.description.includes("[Removed]") && 
+            !(article.source && article.source.name && article.source.name.includes("[Removed]"));
+
+        if (!isValid) {
+            console.warn("Invalid or removed article ignored:", article);
+        }
+        return isValid;
+    });
 
     validArticles.forEach((article) => { 
         createNewsElement(
@@ -181,26 +185,20 @@ function displayNews(data) {
             article.description,
             article.source.name,
             article.publishedAt,
-            article.url
+            article.url,
+            article.content // Pass content only to the modal
         );
     });
 
     if (validArticles.length === 0) {
         const noNewsMessage = document.createElement("p");
-        noNewsMessage.textContent = "Inga artiklar kunde hämtas.";
+        noNewsMessage.textContent = "No articles could be retrieved.";
         newsList.appendChild(noNewsMessage);
     }
-
-    if (data.length === 0) {
-        const noResultsMessage = document.createElement("p");
-        noResultsMessage.textContent = "Inga nyheter hittades för din sökning.";
-        newsList.appendChild(noResultsMessage);
-        return;
-    }
-
 }
 
-  function createNewsElement(title, description, source, date, url) {
+
+  function createNewsElement(title, description, source, date, url, content) {
     const newsItem = document.createElement("li");
     newsItem.classList.add("news-item");
   
@@ -221,39 +219,86 @@ function displayNews(data) {
     newsDate.textContent = formatDate(date);
 
     //lagt till läs mer knapp
-    const readMoreButton = document.createElement("a");
+    const readMoreButton = document.createElement("button");
     readMoreButton.classList.add("read-more");
-    readMoreButton.textContent = "Läs mer";
-    readMoreButton.href = url;
-    readMoreButton.target = "_blank"; 
-    readMoreButton.rel = "noopener noreferrer"; 
+    readMoreButton.textContent = "Read more";
+    readMoreButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        // Pass the content to the modal when "Read More" is clicked
+        createInfoModal({
+            title: title,
+            description: description,
+            content: content, // Content passed to modal
+            source: source,
+            date: date,
+            url: url
+        });
+    });
+
+
   
     newsItem.appendChild(newsTitle);
     newsItem.appendChild(newsDescription);
     newsItem.appendChild(newsSource);
     newsItem.appendChild(newsDate);
     newsItem.appendChild(readMoreButton);
-  
     newsList.appendChild(newsItem);
 }
+
+function createInfoModal(article) {
+    const modal = document.getElementById("moreInfoModal");
+
+    // Clean up the content
+    const cleanedContent = article.content
+    ? article.content.split(" [+")[0] // Remove everything after " [+"
+    : "No additional content available.";
+
+    // If the first 10 words of content and description are the same, remove the description
+    const contentWords = article.content.split(/\s+/).slice(0, 10).join(" ");
+    const descriptionWords = article.description.split(/\s+/).slice(0, 10).join(" ");
+    if (contentWords === descriptionWords) {
+        article.description = "";
+    }
+
+    // Populate modal with article details
+    document.getElementById("modal-title").textContent = article.title;
+    document.getElementById("modal-description").textContent = article.description || "No description available."; // Display description
+    document.getElementById("modal-content").textContent = cleanedContent; // Display cleaned content
+    document.getElementById("modal-source").textContent = `Source: ${article.source}`;
+    document.getElementById("modal-date").textContent = `Published: ${formatDate(article.date)}`;
+    document.getElementById("modal-url").href = article.url;
+
+    // Show the modal
+    modal.classList.remove("hidden");
+
+    // Close modal on overlay click or button click
+    const overlay = modal.querySelector(".modal-overlay");
+    const closeButton = modal.querySelector(".modal-close-button");
+
+    function closeModal() {
+        modal.classList.add("hidden");
+    }
+
+    overlay.addEventListener("click", closeModal);
+    closeButton.addEventListener("click", closeModal);
+}
+
+  
 
 // SEARCH NEWS function which returns url for fetch
 
 
 // event listener search
 searchButton.addEventListener("click", () => {
-    
+    currentPage = 1; // Reset to the first page
     const url = searchNews();
     
-    if (!url) {
-      console.log("Ingen giltig URL att hämta data från.");
-      return; // Stops if no valid URL
-    }  
+    console.log("url: ", url);
+    // returns url for search
 
     fetchNews(url); 
 
 });
-
 
 // FILTER
 
@@ -261,8 +306,8 @@ searchButton.addEventListener("click", () => {
   categoryFilter.addEventListener("change", filterNews);
   function filterNews(event) {
 
-      currentPage = 1; // Reset to the first page
-  const selectedCategory = event.target.value;
+    currentPage = 1; // Reset to the first page
+    const selectedCategory = event.target.value;
     let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
     fetchNews(filteredFetch);
     console.log("filteredFetch: ", filteredFetch);
