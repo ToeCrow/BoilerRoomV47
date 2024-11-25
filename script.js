@@ -1,12 +1,33 @@
 // script.js
 import { API_KEY } from "./config.js";
 const apiKey = API_KEY;
+//lägg in url du vill hämta data från
+const BASE_URL = 'https://newsapi.org/v2/top-headlines';
 const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsList = document.getElementById("news-list"); // ul element
 
-let currentPage = 1; // Keeps track of the current page
-const pageSize = 9; // Amount of news items per page
+
+// async function fetchData(apiUrl, userQuery, apiKey) {
+//     // Validering av användarens sökinput
+    
+
+//     const url = `${apiUrl}?query=${encodeURIComponent(userQuery)}&apiKey=${apiKey}`;
+
+//     try {
+//         const response = await fetch(url);
+
+        
+
+//         const data = await response.json();
+
+        
+
+//         return data; // Returnera resultaten om allt fungerar
+//     } 
+// };
+
+
 
 async function fetchNews(url) {
     try {
@@ -55,7 +76,7 @@ async function fetchNews(url) {
         const data = await response.json();
 
         // Hantera fall där API returnerar tomma resultat
-        if (!data.articles || data.articles.length === 0) {
+        if (!data || !data.articles || data.articles.length === 0) {
             console.log("Inga resultat hittades för din sökfråga");
             
             newsList.innerHTML = ""; // Clear existing news items
@@ -68,9 +89,8 @@ async function fetchNews(url) {
 
 
         displayNews(data.articles);
-        // Uppdate pagination based on API-results
-        updatePaginationButtons(data.totalResults);
-        console.log("fetchNews output: ", data.articles);
+        
+        console.log("fetchNews output inside: ", data.articles);
         
         return data.articles; //  returns articles as JS list
         
@@ -82,39 +102,6 @@ async function fetchNews(url) {
         return error.message;
     }
 }
-
-function updatePaginationButtons(totalResults) {
-    const totalPages = Math.ceil(totalResults / pageSize);
-    document.getElementById("current-page").textContent = currentPage;
-
-    const prevButton = document.getElementById("prev-page");
-    const nextButton = document.getElementById("next-page");
-    const paginationSection = document.querySelector(".pagination-section");
-
-    // Shows or hides pagination based on the amount of articles
-    // if (totalResults > pageSize) {
-    //     paginationSection.style.display = "flex"; // Visa pagination
-    // } else {
-    //     paginationSection.style.display = "none"; // Dölj pagination
-    // }
-    // Activate or deactivate pagination buttons based on current page
-    prevButton.disabled = currentPage <= 1;
-    nextButton.disabled = currentPage >= totalPages;
-
-}
-
-document.getElementById("prev-page").addEventListener("click", () => {
-    if (currentPage > 1) {
-        currentPage--;
-        fetchNews(searchNews()); // Use the current search
-    }
-});
-
-document.getElementById("next-page").addEventListener("click", () => {
-    currentPage++;
-    fetchNews(searchNews()); // Use the current search
-});
-
 
     //uppdaterat formatdate
  function formatDate(publishedAt) {
@@ -163,12 +150,6 @@ function searchNews() {
     // `https://newsapi.org/v2/top-headlines?limit=${pageSize}&skip=${skip}&${query}apiKey=${apiKey}`
     console.log("url som returneras: ", url);
     return url; // returns url
-}
-
-function articleSkip(pageSize, currentPage) {
-
-    return (currentPage - 1) * pageSize;
-    
 }
 
 //uppdaterad function för att ta bort removed articles och invalid dates
@@ -241,6 +222,7 @@ function displayNews(data) {
 
     //lagt till läs mer knapp
     const readMoreButton = document.createElement("a");
+    const readMoreButton = document.createElement("a");
     readMoreButton.classList.add("read-more");
     readMoreButton.textContent = "Läs mer";
     readMoreButton.href = url;
@@ -252,6 +234,7 @@ function displayNews(data) {
     newsItem.appendChild(newsSource);
     newsItem.appendChild(newsDate);
     newsItem.appendChild(readMoreButton);
+  
     newsList.appendChild(newsItem);
 }
 
@@ -260,7 +243,7 @@ function displayNews(data) {
 
 // event listener search
 searchButton.addEventListener("click", () => {
-    currentPage = 1; // Reset to the first page
+    
     const url = searchNews();
     
     if (!url) {
