@@ -181,13 +181,9 @@ function displayNews(data) {
             article.description,
             article.source.name,
             article.publishedAt,
-<<<<<<< HEAD
-            article.url
-=======
             article.url,
             article.content, // Pass content only to the modal
             article.urlToImage // Pass content only to the modal
->>>>>>> 656ca96 (fixed lost merge code)
         );
     });
 
@@ -206,12 +202,8 @@ function displayNews(data) {
 
 }
 
-<<<<<<< HEAD
-  function createNewsElement(title, description, source, date, url) {
-=======
 
   function createNewsElement(title, description, source, date, url, content, urlToImage) {
->>>>>>> 656ca96 (fixed lost merge code)
     const newsItem = document.createElement("li");
     newsItem.classList.add("news-item");
   
@@ -234,12 +226,6 @@ function displayNews(data) {
     //lagt till läs mer knapp
     const readMoreButton = document.createElement("a");
     readMoreButton.classList.add("read-more");
-<<<<<<< HEAD
-    readMoreButton.textContent = "Läs mer";
-    readMoreButton.href = url;
-    readMoreButton.target = "_blank"; 
-    readMoreButton.rel = "noopener noreferrer"; 
-=======
     readMoreButton.textContent = "Read more";
     readMoreButton.addEventListener("click", (event) => {
         event.preventDefault();
@@ -257,7 +243,6 @@ function displayNews(data) {
     });
 
 
->>>>>>> 656ca96 (fixed lost merge code)
   
     newsItem.appendChild(newsTitle);
     newsItem.appendChild(newsDescription);
@@ -268,8 +253,6 @@ function displayNews(data) {
     newsList.appendChild(newsItem);
 }
 
-<<<<<<< HEAD
-=======
 function createInfoModal(article) {
     const modal = document.getElementById("moreInfoModal");
 
@@ -321,7 +304,6 @@ function createInfoModal(article) {
 
   
 
->>>>>>> 656ca96 (fixed lost merge code)
 // SEARCH NEWS function which returns url for fetch
 
 

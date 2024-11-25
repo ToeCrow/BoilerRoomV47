@@ -172,7 +172,9 @@ label {
 }
 
 .read-more {
+    grid-column: 1 / -1;
     color: #fff;
+    background-color: #051827;
     border: none;
     padding: 12px 0;
     border-radius: 0 0 8px 8px;
