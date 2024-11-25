@@ -134,6 +134,12 @@ function searchNews() {
 
   if (cleanedQuery === "") {
       console.log("Sökfrågan kan inte vara tom eller endast specialtecken. Ange ett giltigt sökord.");
+      newsList.innerHTML = "";
+      const emptyMessage = document.createElement("p");
+            emptyMessage.textContent = "Sökfrågan kan inte vara tom eller endast specialtecken. Ange ett giltigt sökord.";
+            emptyMessage.classList.add("error-message");
+            newsList.appendChild(emptyMessage);
+            
       return null;
   }
   
