@@ -296,6 +296,7 @@ searchButton.addEventListener("click", () => {
   const selectedCategory = event.target.value;
     let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
     fetchNews(filteredFetch);
+    searchInput.value = ""; // clear search field
     console.log("filteredFetch: ", filteredFetch);
     return filteredFetch;
   };
