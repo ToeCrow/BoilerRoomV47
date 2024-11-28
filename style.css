@@ -27,7 +27,7 @@ header {
 h1 {
     font-size: 6rem;
     margin: 0;
-    font-family: fantasy;
+    font-family: fantasy, monospace;
     color: #b63d3d;
     font-style: italic;
     font-variant: small-caps;
