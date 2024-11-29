@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     categoryFilter.value = savedCategory;
     displayNews(savedCategory);
     
-});
+}); 
 
 // The code above adds an event listener to the document object.
 // When the "DOMContentLoaded" event is triggered, which is when the initial HTML document has been completely loaded and parsed,
@@ -104,6 +104,20 @@ async function fetchNews(urlNews) {
         console.error("An error occurred:", error.message);
         return error.message;
     }
+}
+
+// function translate Guardian API results to API News format
+function translateGuardianNews(data) {
+    const translatedData = data.map((article) => ({
+        title: article.webTitle,
+        description: article.fields.bodyText,
+        name: "The Guardian",
+        url: article.webUrl,
+        publishedAt: article.webPublicationDate,
+        image: article.fields.thumbnail,
+        urlNews: article.webUrl,
+    }));
+    return translatedData;
 }
 
     //uppdate formatdate
@@ -362,11 +376,19 @@ searchButton.addEventListener("click", () => {
     if (localStorageValue) {
       displayNews(localStorageValue);
     } else {
-      let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
-      fetchNews(filteredFetch).then(articles => {
-        displayNews(articles);
-        localStorage.setItem(localStorageKey, JSON.stringify(articles));
-      });
+    //   let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
+    //   fetchNews(filteredFetch).then(articles => {
+    //     displayNews(articles);
+    //     localStorage.setItem(localStorageKey, JSON.stringify(articles));
+    //   });
+    console.log("There is no locally saved data to display. Try to reload the page. ");
+    // add a message to the user
+    document.getElementById("news-list").innerHTML = "";
+    const emptyMessage = document.createElement("p");
+    emptyMessage.textContent = "News are not being properly loaded. Try to refresh the page.";
+    emptyMessage.classList.add("error-message");
+    document.getElementById("news-list").appendChild(emptyMessage);
+    
     }
 
     searchInput.value = ""; // clear search field
