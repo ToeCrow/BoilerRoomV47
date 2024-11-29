@@ -321,13 +321,26 @@ searchButton.addEventListener("click", () => {
 
   const categoryFilter = document.getElementById("category-filter");
   categoryFilter.addEventListener("change", filterNews);
+
+  
   function filterNews(event) {
 
     //   currentPage = 1; // Reset to the first page
   const selectedCategory = event.target.value;
     let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
-    fetchNews(filteredFetch);
+    const localStorageKey = selectedCategory;
+    const localStorageValue = JSON.parse(localStorage.getItem(localStorageKey));
+    if (localStorageValue) {
+      const articleIdsInLocalStorage = localStorageValue.map(article => article.publishedAt);
+      fetchNews(filteredFetch).then(articles => {
+        const newArticles = articles.filter(article => !articleIdsInLocalStorage.includes(article.publishedAt));
+        const allArticles = [...localStorageValue, ...newArticles];
+        displayNews(allArticles);
+      });
+    } else {
+      fetchNews(filteredFetch);
+    }
     searchInput.value = ""; // clear search field
     console.log("filteredFetch: ", filteredFetch);
-    return filteredFetch;
+    /* return filteredFetch; */
   };
