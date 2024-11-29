@@ -6,6 +6,14 @@ const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsList = document.getElementById("news-list"); // ul element
 
+document.addEventListener("DOMContentLoaded", () => {
+    fetchAllCategories();
+});
+
+// The code above adds an event listener to the document object.
+// When the "DOMContentLoaded" event is triggered, which is when the initial HTML document has been completely loaded and parsed,
+// the fetchAllCategories function is called.
+
 async function fetchNews(url) {
     try {
         // GET-request
@@ -66,6 +74,7 @@ async function fetchNews(url) {
 
 
         displayNews(data.articles);
+
         
         console.log("fetchNews output inside: ", data.articles);
         
@@ -269,7 +278,28 @@ function createInfoModal(article) {
     closeBtn.addEventListener("click", closeModal);
 }
 
-// SEARCH NEWS function which returns url for fetch
+// store array in localstorage
+function fetchAllCategories() {
+    const categoriesArray = ["general", "technology", "sports", "science", "health", "entertainment", "business"];
+    
+    categoriesArray.forEach(async (category) => {
+        const url = await categorySearch(category);
+        const articles = await fetchNews(url);
+        storeArticlesArrayInLocalStorage(articles, category);
+    });
+}
+
+function storeArticlesArrayInLocalStorage(articles, key) {
+    localStorage.setItem(key, JSON.stringify(articles));
+}
+
+function categorySearch(category) {
+    const selectedCategory = category;
+    let categoryFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
+
+    console.log("categoryFetch: ", categoryFetch);
+    return categoryFetch;
+  };
 
 
 // event listener search
