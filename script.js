@@ -10,8 +10,9 @@ let savedSelectedCategory = "general"; // Default category, can be changed by th
 
 document.addEventListener("DOMContentLoaded", () => {
     fetchAllCategories();
-    categoryFilter.value = localStorage.getItem("savedSelectedCategory") || savedSelectedCategory;
-    displayNews();
+    const savedCategory = localStorage.getItem("savedSelectedCategory") || savedSelectedCategory;
+    categoryFilter.value = savedCategory;
+    displayNews(savedCategory);
     
 });
 
@@ -87,7 +88,7 @@ async function fetchNews(url) {
         }
 
 
-        displayNews(data.articles);
+       /*  displayNews(data.articles); */
 
         
         console.log("fetchNews output inside: ", data.articles);
@@ -152,12 +153,28 @@ function searchNews() {
 
 //updated function to remove "removed" articles and invalid dates
 
+
+
 function displayNews(data) {
     console.log(newsList);
+    const categorySelect = document.getElementById("category-filter");
+
+    const categoryIsSelected = categorySelect.value;
     
     newsList.innerHTML = ""; // Clear existing news items
 
-  const validArticles = data.filter(article => {
+    let articlesToDisplay = data;
+
+    if (categoryIsSelected) {
+        const localStorageKey = categorySelect.value;
+        const localStorageValue = JSON.parse(localStorage.getItem(localStorageKey));
+
+        if (localStorageValue) {
+            articlesToDisplay = localStorageValue;
+        }
+    }
+
+  const validArticles = articlesToDisplay.filter(article => {
     const isValid = 
         article.title && 
         article.description && 
