@@ -34,29 +34,36 @@ async function fetchNews(url) {
 
             switch (response.status) {
                 case 400:
-                    errorMessage.textContent = "invalid request (400). Control your URL.";
+                    errorMessage.textContent = "Oops! Something went wrong with your request. Please check the URL and try again.";
+                    console.error("Invalid request (400). Check your URL.");
                     break;
                     
                 case 401:
-                    errorMessage.textContent = "Unothorized access (401). Not a valid API key.";
+                    errorMessage.textContent = "Access denied. Please check your API key and try again.";
+                    console.error("Unauthorized access (401). Invalid API key.");
                     break;
                     
                 case 404:
-                    errorMessage.textContent = "Resource not found (404).";
+                    errorMessage.textContent = "We couldn't find what you're looking for. Please check the URL and try again.";
+                    console.error("Resource not found (404).");
                     break;
                     
                 case 429:
-                    errorMessage.textContent = "Too many requests (429). Max requests is 1000 searches per day. Try again later.";
+                    errorMessage.textContent = "You're making too many requests! Please wait a while before trying again.";
+                    console.error("Too many requests (429). Max limit of 1000 searches per day reached.");
                     break;
                     
                 case 500:
-                    errorMessage.textContent = "Server error (500). Try again later.";
+                    errorMessage.textContent = "Something went wrong on our end. Please try again later.";
+                    console.error("Server error (500). Try again later.");
                     break;
-                    
+            
                 default:
-                    errorMessage.textContent = `Uknown error (${response.status}).`;
-                    
+                    errorMessage.textContent = "An unexpected error occurred. Please try again.";
+                    console.error(`Unexpected error (${response.status}).`);
+                    break;
             }
+            
 
             newsList.innerHTML = ""; // Clear existing news items
             newsList.appendChild(errorMessage);
@@ -354,3 +361,17 @@ searchButton.addEventListener("click", () => {
     searchInput.value = ""; // clear search field
   };
  
+
+//   fetchtimer (10 minuter)
+let isFetching = false;
+
+function fetchNewsTimer() {
+    if (isFetching) return;
+
+    isFetching = true;
+    fetchNews().finally(() => {
+        isFetching = false;
+    });
+}
+
+setInterval(fetchNewsTimer, 600000);
