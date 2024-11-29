@@ -448,44 +448,15 @@ async function fetchNewsFromUrls(urlNews) {
   });
 
   
-  categoryFilterDropdown.addEventListener("change", async (event) => {
-    const selectedCategory = event.target.value;
-    console.log(`Category filter changed to: ${selectedCategory}`);
+  function filterNews(event) {
 
-    const localStorageKey = selectedCategory;
-    const localStorageValue = JSON.parse(localStorage.getItem(localStorageKey));
-
-    if (localStorageValue) {
-        console.log(`Displaying articles from localStorage for category: ${selectedCategory}`);
-        displayNews(localStorageValue);
-    } else {
-    //   let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
-    //   fetchNews(filteredFetch).then(articles => {
-    //     displayNews(articles);
-    //     localStorage.setItem(localStorageKey, JSON.stringify(articles));
-    //   });
-    console.log("There is no locally saved data to display. Try to reload the page. ");
-    // add a message to the user
-    document.getElementById("news-list").innerHTML = "";
-    const emptyMessage = document.createElement("p");
-    emptyMessage.textContent = "News are not being properly loaded. Try to refresh the page.";
-    emptyMessage.classList.add("error-message");
-    document.getElementById("news-list").appendChild(emptyMessage);
-    
-    }
-});
-
-//! not currently in use
-function sortArticlesByDate(articles) {
-    return articles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
-}
-
-/* // Example usage:
-const combinedArticles = [...newsApiArticles, ...guardianApiArticles];
-const sortedArticles = sortArticlesByDate(combinedArticles);
-displayNews(sortedArticles);
- */
-//! ....
+    //   currentPage = 1; // Reset to the first page
+  const selectedCategory = event.target.value;
+    let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
+    fetchNews(filteredFetch);
+    console.log("filteredFetch: ", filteredFetch);
+    return filteredFetch;
+  };
 
 //   fetchtimer (10 minuter)
 let isFetching = false;
