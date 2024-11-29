@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // async function fetchNews(urlNews) {
 async function fetchNews(urlNews) {
-    console.log("fetchNews running for url:", url);
+    console.log("fetchNews running for url:", urlNews);
     
     try {
         // GET-request
@@ -192,8 +192,7 @@ function displayNews(data) {
     return isValid;
 });
 
-
-    validArticles.forEach((article) => { 
+    articlesToDisplay.forEach((article) => { 
         createNewsElement(
             article.title,
             article.description,
@@ -204,19 +203,6 @@ function displayNews(data) {
             article.urlNewsToImage // Pass content only to the modal
         );
     });
-
-    if (validArticles.length === 0) {
-        const noNewsMessage = document.createElement("p");
-        noNewsMessage.textContent = "No news could be found.";
-        newsList.appendChild(noNewsMessage);
-    }
-
-    if (data.length === 0) {
-        const noResultsMessage = document.createElement("p");
-        noResultsMessage.textContent = "No news found for your search.";
-        newsList.appendChild(noResultsMessage);
-        return;
-    }
 
 }
 
