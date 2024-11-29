@@ -7,15 +7,24 @@ const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsList = document.getElementById("news-list"); // ul element
 
+let savedSelectedCategory = "general"; // Default category, can be changed by the user when filtering
+
 document.addEventListener("DOMContentLoaded", () => {
     fetchAllCategories();
+    const savedCategory = localStorage.getItem("savedSelectedCategory") || savedSelectedCategory;
+    categoryFilter.value = savedCategory;
+    displayNews(savedCategory);
+    
 });
 
 // The code above adds an event listener to the document object.
 // When the "DOMContentLoaded" event is triggered, which is when the initial HTML document has been completely loaded and parsed,
 // the fetchAllCategories function is called.
 
+// async function fetchNews(urlNews) {
 async function fetchNews(urlNews) {
+    console.log("fetchNews running for url:", url);
+    
     try {
         // GET-request
         const response = await fetch(urlNews);
@@ -28,29 +37,36 @@ async function fetchNews(urlNews) {
 
             switch (response.status) {
                 case 400:
-                    errorMessage.textContent = "invalid request (400). Control your urlNews.";
+                    errorMessage.textContent = "Oops! Something went wrong with your request. Please check the URL and try again.";
+                    console.error("Invalid request (400). Check your URL.");
                     break;
                     
                 case 401:
-                    errorMessage.textContent = "Unothorized access (401). Not a valid API key.";
+                    errorMessage.textContent = "Access denied. Please check your API key and try again.";
+                    console.error("Unauthorized access (401). Invalid API key.");
                     break;
                     
                 case 404:
-                    errorMessage.textContent = "Resource not found (404).";
+                    errorMessage.textContent = "We couldn't find what you're looking for. Please check the URL and try again.";
+                    console.error("Resource not found (404).");
                     break;
                     
                 case 429:
-                    errorMessage.textContent = "Too many requests (429). Max requests is 1000 searches per day. Try again later.";
+                    errorMessage.textContent = "You're making too many requests! Please wait a while before trying again.";
+                    console.error("Too many requests (429). Max limit of 1000 searches per day reached.");
                     break;
                     
                 case 500:
-                    errorMessage.textContent = "Server error (500). Try again later.";
+                    errorMessage.textContent = "Something went wrong on our end. Please try again later.";
+                    console.error("Server error (500). Try again later.");
                     break;
-                    
+            
                 default:
-                    errorMessage.textContent = `Uknown error (${response.status}).`;
-                    
+                    errorMessage.textContent = "An unexpected error occurred. Please try again.";
+                    console.error(`Unexpected error (${response.status}).`);
+                    break;
             }
+            
 
             newsList.innerHTML = ""; // Clear existing news items
             newsList.appendChild(errorMessage);
@@ -74,7 +90,7 @@ async function fetchNews(urlNews) {
         }
 
 
-        // displayNews(data.articles);
+       /*  displayNews(data.articles); */
 
         
         console.log("fetchNews output inside: ", data.articles);
@@ -139,26 +155,43 @@ function searchNews() {
 
 //updated function to remove "removed" articles and invalid dates
 
+
+
 function displayNews(data) {
     console.log(newsList);
+    const categorySelect = document.getElementById("category-filter");
+
+    const categoryIsSelected = categorySelect.value;
     
     newsList.innerHTML = ""; // Clear existing news items
 
-  const validArticles = data.filter(article => {
+    let articlesToDisplay = data;
+
+    if (categoryIsSelected) {
+        const localStorageKey = categorySelect.value;
+        const localStorageValue = JSON.parse(localStorage.getItem(localStorageKey));
+
+        if (localStorageValue) {
+            articlesToDisplay = localStorageValue;
+        }
+    }
+
+  const validArticles = articlesToDisplay.filter(article => {
     const isValid = 
         article.title && 
         article.description && 
         article.publishedAt && 
         article.urlNews && 
         !article.title.includes("[Removed]") && 
-        !article.description.includes("[Removed]") && 
-        !(article.source && article.source.name && article.source.name.includes("[Removed]"));
-    
+        !article.description.includes("[Removed]"); // && 
+        // !(article.source && article.source.name && article.source.name.includes("[Removed]"));
+
     if (!isValid) {
         console.warn("Ogiltig eller borttagen artikel ignorerad:", article);
     }
     return isValid;
 });
+
 
     validArticles.forEach((article) => { 
         createNewsElement(
@@ -282,18 +315,22 @@ function createInfoModal(article) {
 function fetchAllCategories() {
     const categoriesArray = ["general", "technology", "sports", "science", "health", "entertainment", "business"];
     
-    categoriesArray.forEach(async (category) => {
-        const urlNews = await categorySearch(category);
-        const articles = await fetchNews(urlNews);
-        storeArticlesArrayInLocalStorage(articles, category);
-    });
+    async function fetchCategoriesArray() {
+        await Promise.all(categoriesArray.map(async (category) => {
+            const urlCategory = await categorySearch(category);
+            const articles = await fetchNews(urlCategory);
+            storeArticlesArrayInLocalStorage(articles, category);
+        }));
+    }
+    fetchCategoriesArray();
+
 }
 
 function storeArticlesArrayInLocalStorage(articles, key) {
     localStorage.setItem(key, JSON.stringify(articles));
 }
 
-function categorySearch(category) {
+ function categorySearch(category) {
     const selectedCategory = category;
     let categoryFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
 
@@ -324,13 +361,42 @@ searchButton.addEventListener("click", () => {
 // FILTER
 
   const categoryFilter = document.getElementById("category-filter");
-  categoryFilter.addEventListener("change", filterNews);
-  function filterNews(event) {
 
-    //   currentPage = 1; // Reset to the first page
-  const selectedCategory = event.target.value;
-    let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
-    fetchNews(filteredFetch);
-    console.log("filteredFetch: ", filteredFetch);
-    return filteredFetch;
+  categoryFilter.addEventListener("change", filterNews);
+
+  
+  function filterNews(event) {
+    const selectedCategory = event.target.value;
+    savedSelectedCategory = selectedCategory; // update value for savedSelectedCategory
+    localStorage.setItem("savedSelectedCategory", selectedCategory);
+
+    const localStorageKey = selectedCategory;
+    const localStorageValue = JSON.parse(localStorage.getItem(localStorageKey));
+
+    if (localStorageValue) {
+      displayNews(localStorageValue);
+    } else {
+      let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
+      fetchNews(filteredFetch).then(articles => {
+        displayNews(articles);
+        localStorage.setItem(localStorageKey, JSON.stringify(articles));
+      });
+    }
+
+    searchInput.value = ""; // clear search field
   };
+ 
+
+//   fetchtimer (10 minuter)
+let isFetching = false;
+
+function fetchNewsTimer() {
+    if (isFetching) return;
+
+    isFetching = true;
+    fetchNews().finally(() => {
+        isFetching = false;
+    });
+}
+
+setInterval(fetchNewsTimer, 600000);
