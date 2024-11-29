@@ -1,15 +1,33 @@
 // script.js
-import { API_KEY } from "./config.js";
+import { API_KEY, API_KEY_GUARDIAN } from "./config.js";
 const apiKey = API_KEY;
-// Add the url you want to retrieve data from
+const apiKeyGuardian = API_KEY_GUARDIAN;
+// Add the urlNews you want to retrieve data from
 const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsList = document.getElementById("news-list"); // ul element
 
-async function fetchNews(url) {
+let savedSelectedCategory = "general"; // Default category, can be changed by the user when filtering
+
+document.addEventListener("DOMContentLoaded", () => {
+    fetchAllCategories();
+    const savedCategory = localStorage.getItem("savedSelectedCategory") || savedSelectedCategory;
+    categoryFilter.value = savedCategory;
+    displayNews(savedCategory);
+    
+});
+
+// The code above adds an event listener to the document object.
+// When the "DOMContentLoaded" event is triggered, which is when the initial HTML document has been completely loaded and parsed,
+// the fetchAllCategories function is called.
+
+// async function fetchNews(urlNews) {
+async function fetchNews(urlNews) {
+    console.log("fetchNews running for url:", urlNews);
+    
     try {
         // GET-request
-        const response = await fetch(url);
+        const response = await fetch(urlNews);
 
         // Controlling fetching errors
 
@@ -72,7 +90,8 @@ async function fetchNews(url) {
         }
 
 
-        displayNews(data.articles);
+       /*  displayNews(data.articles); */
+
         
         console.log("fetchNews output inside: ", data.articles);
         
@@ -129,33 +148,50 @@ function searchNews() {
   
   const query = `q=${cleanedQuery}&`;
     
-    const url = `https://newsapi.org/v2/top-headlines?${query}apiKey=${apiKey}`;    
-    console.log("url that is returned: ", url);
-    return url; // returns url
+    const urlNews = [`https://newsapi.org/v2/top-headlines?${query}apiKey=${apiKey}`,`https://content.guardianapis.com/search?${query}api-key=${apiKeyGuardian}`];    
+    console.log("urlNews that is returned: ", urlNews);
+    return urlNews; // returns urlNews
 }
 
 //updated function to remove "removed" articles and invalid dates
 
+
+
 function displayNews(data) {
     console.log(newsList);
+    const categorySelect = document.getElementById("category-filter");
+
+    const categoryIsSelected = categorySelect.value;
     
     newsList.innerHTML = ""; // Clear existing news items
 
-  const validArticles = data.filter(article => {
+    let articlesToDisplay = data;
+
+    if (categoryIsSelected) {
+        const localStorageKey = categorySelect.value;
+        const localStorageValue = JSON.parse(localStorage.getItem(localStorageKey));
+
+        if (localStorageValue) {
+            articlesToDisplay = localStorageValue;
+        }
+    }
+
+  const validArticles = articlesToDisplay.filter(article => {
     const isValid = 
         article.title && 
         article.description && 
         article.publishedAt && 
-        article.url && 
+        article.urlNews && 
         !article.title.includes("[Removed]") && 
-        !article.description.includes("[Removed]") && 
-        !(article.source && article.source.name && article.source.name.includes("[Removed]"));
-    
+        !article.description.includes("[Removed]"); // && 
+        // !(article.source && article.source.name && article.source.name.includes("[Removed]"));
+
     if (!isValid) {
         console.warn("Ogiltig eller borttagen artikel ignorerad:", article);
     }
     return isValid;
 });
+
 
     validArticles.forEach((article) => { 
         createNewsElement(
@@ -163,9 +199,9 @@ function displayNews(data) {
             article.description,
             article.source.name,
             article.publishedAt,
-            article.url,
+            article.urlNews,
             article.content, // Pass content only to the modal
-            article.urlToImage // Pass content only to the modal
+            article.urlNewsToImage // Pass content only to the modal
         );
     });
 
@@ -185,7 +221,7 @@ function displayNews(data) {
 }
 
 
-  function createNewsElement(title, description, source, date, url, content, urlToImage) {
+  function createNewsElement(title, description, source, date, urlNews, content, urlNewsToImage) {
     const newsItem = document.createElement("li");
     newsItem.classList.add("news-item");
   
@@ -218,8 +254,8 @@ function displayNews(data) {
             content: content, // Content passed to modal
             source: source,
             date: date,
-            url: url,
-            urlToImage: urlToImage
+            urlNews: urlNews,
+            urlNewsToImage: urlNewsToImage
             
         });
     });
@@ -254,10 +290,10 @@ function createInfoModal(article) {
     document.getElementById("modal-content").textContent = cleanedContent; // Display cleaned content
     document.getElementById("modal-source").textContent = `Source: ${article.source}`;
     document.getElementById("modal-date").textContent = `Published: ${formatDate(article.date)}`;
-    document.getElementById("modal-url").href = article.url;
-    document.getElementById("modal-image").src = article.urlToImage;    
+    document.getElementById("modal-urlNews").href = article.urlNews;
+    document.getElementById("modal-image").src = article.urlNewsToImage;    
 
-    console.log("url to image:", article.urlToImage);
+    console.log("urlNews to image:", article.urlNewsToImage);
     // Show the modal
     modal.classList.remove("hidden");
 
@@ -275,37 +311,81 @@ function createInfoModal(article) {
     closeBtn.addEventListener("click", closeModal);
 }
 
-// SEARCH NEWS function which returns url for fetch
+// store array in localstorage
+function fetchAllCategories() {
+    const categoriesArray = ["general", "technology", "sports", "science", "health", "entertainment", "business"];
+    
+    async function fetchCategoriesArray() {
+        await Promise.all(categoriesArray.map(async (category) => {
+            const urlCategory = await categorySearch(category);
+            const articles = await fetchNews(urlCategory);
+            storeArticlesArrayInLocalStorage(articles, category);
+        }));
+    }
+    fetchCategoriesArray();
+
+}
+
+function storeArticlesArrayInLocalStorage(articles, key) {
+    localStorage.setItem(key, JSON.stringify(articles));
+}
+
+ function categorySearch(category) {
+    const selectedCategory = category;
+    let categoryFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
+
+    console.log("categoryFetch: ", categoryFetch);
+    return categoryFetch;
+  };
 
 
 // event listener search
 searchButton.addEventListener("click", () => {
     
-    const url = searchNews();
+    const urlNews = searchNews();
     
-    if (!url) {
-      console.log("No valid URL to fetch data from.");
-      return; // Stops if no valid URL
+    if (!urlNews) {
+      console.log("No valid urlNews to fetch data from.");
+      return; // Stops if no valid urlNews
     }  
-
-    fetchNews(url); 
-
+    async function fetchNewsFromUrls() {
+        for (const url of urlNews) {
+            await fetchNews(url);
+        }
+    }
+    const articles = fetchNewsFromUrls();
+    displayNews(articles);
 });
 
 
 // FILTER
 
   const categoryFilter = document.getElementById("category-filter");
-  categoryFilter.addEventListener("change", filterNews);
-  function filterNews(event) {
 
-    //   currentPage = 1; // Reset to the first page
-  const selectedCategory = event.target.value;
-    let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
-    fetchNews(filteredFetch);
-    console.log("filteredFetch: ", filteredFetch);
-    return filteredFetch;
+  categoryFilter.addEventListener("change", filterNews);
+
+  
+  function filterNews(event) {
+    const selectedCategory = event.target.value;
+    savedSelectedCategory = selectedCategory; // update value for savedSelectedCategory
+    localStorage.setItem("savedSelectedCategory", selectedCategory);
+
+    const localStorageKey = selectedCategory;
+    const localStorageValue = JSON.parse(localStorage.getItem(localStorageKey));
+
+    if (localStorageValue) {
+      displayNews(localStorageValue);
+    } else {
+      let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
+      fetchNews(filteredFetch).then(articles => {
+        displayNews(articles);
+        localStorage.setItem(localStorageKey, JSON.stringify(articles));
+      });
+    }
+
+    searchInput.value = ""; // clear search field
   };
+ 
 
 //   fetchtimer (10 minuter)
 let isFetching = false;
