@@ -141,14 +141,15 @@ function displayNews(data) {
         article.publishedAt && 
         article.url && 
         !article.title.includes("[Removed]") && 
-        !article.description.includes("[Removed]") && 
-        !(article.source && article.source.name && article.source.name.includes("[Removed]"));
-    
+        !article.description.includes("[Removed]"); // && 
+        // !(article.source && article.source.name && article.source.name.includes("[Removed]"));
+
     if (!isValid) {
         console.warn("Ogiltig eller borttagen artikel ignorerad:", article);
     }
     return isValid;
 });
+
 
     validArticles.forEach((article) => { 
         createNewsElement(
