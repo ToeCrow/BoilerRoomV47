@@ -366,34 +366,14 @@ searchButton.addEventListener("click", () => {
 
   
   function filterNews(event) {
-    const selectedCategory = event.target.value;
-    savedSelectedCategory = selectedCategory; // update value for savedSelectedCategory
-    localStorage.setItem("savedSelectedCategory", selectedCategory);
 
-    const localStorageKey = selectedCategory;
-    const localStorageValue = JSON.parse(localStorage.getItem(localStorageKey));
-
-    if (localStorageValue) {
-      displayNews(localStorageValue);
-    } else {
-    //   let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
-    //   fetchNews(filteredFetch).then(articles => {
-    //     displayNews(articles);
-    //     localStorage.setItem(localStorageKey, JSON.stringify(articles));
-    //   });
-    console.log("There is no locally saved data to display. Try to reload the page. ");
-    // add a message to the user
-    document.getElementById("news-list").innerHTML = "";
-    const emptyMessage = document.createElement("p");
-    emptyMessage.textContent = "News are not being properly loaded. Try to refresh the page.";
-    emptyMessage.classList.add("error-message");
-    document.getElementById("news-list").appendChild(emptyMessage);
-    
-    }
-
-    searchInput.value = ""; // clear search field
+    //   currentPage = 1; // Reset to the first page
+  const selectedCategory = event.target.value;
+    let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
+    fetchNews(filteredFetch);
+    console.log("filteredFetch: ", filteredFetch);
+    return filteredFetch;
   };
- 
 
 //   fetchtimer (10 minuter)
 let isFetching = false;
