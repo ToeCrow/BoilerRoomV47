@@ -1,15 +1,24 @@
 // script.js
-import { API_KEY } from "./config.js";
+import { API_KEY, API_KEY_GUARDIAN } from "./config.js";
 const apiKey = API_KEY;
-// Add the url you want to retrieve data from
+const apiKeyGuardian = API_KEY_GUARDIAN;
+// Add the urlNews you want to retrieve data from
 const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsList = document.getElementById("news-list"); // ul element
 
-async function fetchNews(url) {
+document.addEventListener("DOMContentLoaded", () => {
+    fetchAllCategories();
+});
+
+// The code above adds an event listener to the document object.
+// When the "DOMContentLoaded" event is triggered, which is when the initial HTML document has been completely loaded and parsed,
+// the fetchAllCategories function is called.
+
+async function fetchNews(urlNews) {
     try {
         // GET-request
-        const response = await fetch(url);
+        const response = await fetch(urlNews);
 
         // Controlling fetching errors
 
@@ -19,7 +28,7 @@ async function fetchNews(url) {
 
             switch (response.status) {
                 case 400:
-                    errorMessage.textContent = "invalid request (400). Control your URL.";
+                    errorMessage.textContent = "invalid request (400). Control your urlNews.";
                     break;
                     
                 case 401:
@@ -65,7 +74,8 @@ async function fetchNews(url) {
         }
 
 
-        displayNews(data.articles);
+        // displayNews(data.articles);
+
         
         console.log("fetchNews output inside: ", data.articles);
         
@@ -122,9 +132,9 @@ function searchNews() {
   
   const query = `q=${cleanedQuery}&`;
     
-    const url = `https://newsapi.org/v2/top-headlines?${query}apiKey=${apiKey}`;    
-    console.log("url that is returned: ", url);
-    return url; // returns url
+    const urlNews = [`https://newsapi.org/v2/top-headlines?${query}apiKey=${apiKey}`,`https://content.guardianapis.com/search?${query}api-key=${apiKeyGuardian}`];    
+    console.log("urlNews that is returned: ", urlNews);
+    return urlNews; // returns urlNews
 }
 
 //updated function to remove "removed" articles and invalid dates
@@ -139,7 +149,7 @@ function displayNews(data) {
         article.title && 
         article.description && 
         article.publishedAt && 
-        article.url && 
+        article.urlNews && 
         !article.title.includes("[Removed]") && 
         !article.description.includes("[Removed]") && 
         !(article.source && article.source.name && article.source.name.includes("[Removed]"));
@@ -156,9 +166,9 @@ function displayNews(data) {
             article.description,
             article.source.name,
             article.publishedAt,
-            article.url,
+            article.urlNews,
             article.content, // Pass content only to the modal
-            article.urlToImage // Pass content only to the modal
+            article.urlNewsToImage // Pass content only to the modal
         );
     });
 
@@ -178,7 +188,7 @@ function displayNews(data) {
 }
 
 
-  function createNewsElement(title, description, source, date, url, content, urlToImage) {
+  function createNewsElement(title, description, source, date, urlNews, content, urlNewsToImage) {
     const newsItem = document.createElement("li");
     newsItem.classList.add("news-item");
   
@@ -211,8 +221,8 @@ function displayNews(data) {
             content: content, // Content passed to modal
             source: source,
             date: date,
-            url: url,
-            urlToImage: urlToImage
+            urlNews: urlNews,
+            urlNewsToImage: urlNewsToImage
             
         });
     });
@@ -247,10 +257,10 @@ function createInfoModal(article) {
     document.getElementById("modal-content").textContent = cleanedContent; // Display cleaned content
     document.getElementById("modal-source").textContent = `Source: ${article.source}`;
     document.getElementById("modal-date").textContent = `Published: ${formatDate(article.date)}`;
-    document.getElementById("modal-url").href = article.url;
-    document.getElementById("modal-image").src = article.urlToImage;    
+    document.getElementById("modal-urlNews").href = article.urlNews;
+    document.getElementById("modal-image").src = article.urlNewsToImage;    
 
-    console.log("url to image:", article.urlToImage);
+    console.log("urlNews to image:", article.urlNewsToImage);
     // Show the modal
     modal.classList.remove("hidden");
 
@@ -268,21 +278,46 @@ function createInfoModal(article) {
     closeBtn.addEventListener("click", closeModal);
 }
 
-// SEARCH NEWS function which returns url for fetch
+// store array in localstorage
+function fetchAllCategories() {
+    const categoriesArray = ["general", "technology", "sports", "science", "health", "entertainment", "business"];
+    
+    categoriesArray.forEach(async (category) => {
+        const urlNews = await categorySearch(category);
+        const articles = await fetchNews(urlNews);
+        storeArticlesArrayInLocalStorage(articles, category);
+    });
+}
+
+function storeArticlesArrayInLocalStorage(articles, key) {
+    localStorage.setItem(key, JSON.stringify(articles));
+}
+
+function categorySearch(category) {
+    const selectedCategory = category;
+    let categoryFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
+
+    console.log("categoryFetch: ", categoryFetch);
+    return categoryFetch;
+  };
 
 
 // event listener search
 searchButton.addEventListener("click", () => {
     
-    const url = searchNews();
+    const urlNews = searchNews();
     
-    if (!url) {
-      console.log("No valid URL to fetch data from.");
-      return; // Stops if no valid URL
+    if (!urlNews) {
+      console.log("No valid urlNews to fetch data from.");
+      return; // Stops if no valid urlNews
     }  
-
-    fetchNews(url); 
-
+    async function fetchNewsFromUrls() {
+        for (const url of urlNews) {
+            await fetchNews(url);
+        }
+    }
+    const articles = fetchNewsFromUrls();
+    displayNews(articles);
 });
 
 
