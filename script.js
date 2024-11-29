@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // the fetchAllCategories function is called.
 
 async function fetchNews(url) {
+    console.log("fetchNews running for url:", url);
+    
     try {
         // GET-request
         const response = await fetch(url);
@@ -291,6 +293,8 @@ function fetchAllCategories() {
         const url = await categorySearch(category);
         const articles = await fetchNews(url);
         storeArticlesArrayInLocalStorage(articles, category);
+        console.log("category and articles in local storage: ", category, articles);
+        
     });
 }
 
@@ -349,3 +353,4 @@ searchButton.addEventListener("click", () => {
 
     searchInput.value = ""; // clear search field
   };
+ 
