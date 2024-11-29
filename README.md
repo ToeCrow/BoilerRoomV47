@@ -38,3 +38,20 @@ Efter en välförtjänt rast.
 Ser vi över vad som fortfarande felar behövs och bestämmer att även lördag kommer vi köra för att få det att funka.
 Vi har lite fel meddelanden vi måste kolla över, samt köra igen.
 Det har med olika tankar om hur vi kör varit en utmaning att få fetchen att fungera som vi vill och enligt uppgiften.
+
+
+lördag delar vi upp det som är kvar att göra och alla gör sin del i helgen
+
+måndag skulle vi endast fördelat presentationen, men fick githubproblem och satt i två timmar för att lösa.
+retro går vi genom att det är svårt att planera i detalj och att vi skall försöka använda teamleader mer som klister och den som har planen.
+
+v48
+Möte på torsdag för att försöka se vad vi behöver göra. Lite forvirring med steg 1 och 2 hur vi skall kunna få till båda.
+Vill hämta alla kategorier för att kunna köra promise.all och ändra på search för att välja source där.
+
+fredag
+vi kör en kort standup och kommer på att vi kan få problem att få till promise.all kravet då vi använder en foreach på kategorierna då det är snyggt i kod.
+möte med Mandus för att få lite hjälp att hitta en lösning på detta. Vi bestämmar att vi hämtar ett nytt api, så vi kan ha dubbelt upp med api för vår fetch att köra promise.all. Det är guardian-apiet.
+
+Vi måste översätta data från guardian till newsapi så vi får inte samma data till resten av koden.
+Vi mergar allt till staging så vi har samma utgångspunkt.
