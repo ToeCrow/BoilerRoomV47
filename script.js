@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // async function fetchNews(urlNews) {
 async function fetchNews(urlNews) {
-    console.log("fetchNews running for url:", url);
+    console.log("fetchNews running for url:", urlNews);
     
     try {
         // GET-request
