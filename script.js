@@ -6,8 +6,13 @@ const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsList = document.getElementById("news-list"); // ul element
 
+let savedSelectedCategory = "general"; // Default category, can be changed by the user when filtering
+
 document.addEventListener("DOMContentLoaded", () => {
     fetchAllCategories();
+    categoryFilter.value = localStorage.getItem("savedSelectedCategory") || savedSelectedCategory;
+    displayNews();
+    
 });
 
 // The code above adds an event listener to the document object.
@@ -320,27 +325,27 @@ searchButton.addEventListener("click", () => {
 // FILTER
 
   const categoryFilter = document.getElementById("category-filter");
+
   categoryFilter.addEventListener("change", filterNews);
 
   
   function filterNews(event) {
+    const selectedCategory = event.target.value;
+    savedSelectedCategory = selectedCategory; // update value for savedSelectedCategory
+    localStorage.setItem("savedSelectedCategory", selectedCategory);
 
-    //   currentPage = 1; // Reset to the first page
-  const selectedCategory = event.target.value;
-    let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
     const localStorageKey = selectedCategory;
     const localStorageValue = JSON.parse(localStorage.getItem(localStorageKey));
+
     if (localStorageValue) {
-      const articleIdsInLocalStorage = localStorageValue.map(article => article.publishedAt);
-      fetchNews(filteredFetch).then(articles => {
-        const newArticles = articles.filter(article => !articleIdsInLocalStorage.includes(article.publishedAt));
-        const allArticles = [...localStorageValue, ...newArticles];
-        displayNews(allArticles);
-      });
+      displayNews(localStorageValue);
     } else {
-      fetchNews(filteredFetch);
+      let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
+      fetchNews(filteredFetch).then(articles => {
+        displayNews(articles);
+        localStorage.setItem(localStorageKey, JSON.stringify(articles));
+      });
     }
+
     searchInput.value = ""; // clear search field
-    console.log("filteredFetch: ", filteredFetch);
-    /* return filteredFetch; */
   };
