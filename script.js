@@ -20,7 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const savedCategory = localStorage.getItem("savedSelectedCategory") || savedSelectedCategory;
     categoryFilterDropdown.value = savedCategory;
     displayNews(savedCategory);
-});
+    
+}); 
 
 // The code above adds an event listener to the document object.
 // When the "DOMContentLoaded" event is triggered, which is when the initial HTML document has been completely loaded and parsed,
@@ -106,15 +107,43 @@ document.addEventListener("DOMContentLoaded", () => {
             errorMessage.classList.add("error-message");
             errorMessage.textContent = "An error occurred while fetching the news. Please check your internet connection and try again.";
             newsList.innerHTML = ""; // Clear existing news items
-            newsList.appendChild(errorMessage); // Display error message to the user
-            return [];
+
+            const emptyMessage = document.createElement("p");
+            emptyMessage.textContent = "No results found for your search";
+            newsList.appendChild(emptyMessage);
+            return "No results found for your search.";
         }
+
+
+       /*  displayNews(data.articles); */
+
+        
+        console.log("fetchNews output inside: ", data.articles);
+        
+        return data.articles; //  returns articles as JS list
+        
+        
+
+    } catch (error) {
+        // Log the error for development or show user-friendly error message
+        console.error("An error occurred:", error.message);
+        return error.message;
     }
-    
+}
 
 // function translate Guardian API results to API News format
-
-
+function translateGuardianNews(data) {
+    const translatedData = data.map((article) => ({
+        title: article.webTitle,
+        description: article.fields.bodyText,
+        name: "The Guardian",
+        url: article.webUrl,
+        publishedAt: article.webPublicationDate,
+        image: article.fields.thumbnail,
+        urlNews: article.webUrl,
+    }));
+    return translatedData;
+}
 
     //uppdate formatdate
  function formatDate(publishedAt) {
@@ -430,23 +459,19 @@ async function fetchNewsFromUrls(urlNews) {
         console.log(`Displaying articles from localStorage for category: ${selectedCategory}`);
         displayNews(localStorageValue);
     } else {
-        console.log(`Fetching articles for category ${selectedCategory} from APIs.`);
-        const newsApiUrl = getCategoryApiUrl(selectedCategory, "newsapi");
-        const guardianApiUrl = getCategoryApiUrl(selectedCategory, "guardian");
-
-        const [newsApiArticles, guardianApiArticles] = await Promise.all([
-            fetchNews(newsApiUrl),
-            fetchNews(guardianApiUrl)
-        ]);
-
-        const combinedArticles = [...newsApiArticles, ...guardianApiArticles];
-        console.log(`Combined articles for category ${selectedCategory}:`, combinedArticles);
-
-        // Save to localStorage for faster future access
-        storeArticlesArrayInLocalStorage(combinedArticles, selectedCategory);
-
-        // Display articles
-        displayNews(combinedArticles);
+    //   let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
+    //   fetchNews(filteredFetch).then(articles => {
+    //     displayNews(articles);
+    //     localStorage.setItem(localStorageKey, JSON.stringify(articles));
+    //   });
+    console.log("There is no locally saved data to display. Try to reload the page. ");
+    // add a message to the user
+    document.getElementById("news-list").innerHTML = "";
+    const emptyMessage = document.createElement("p");
+    emptyMessage.textContent = "News are not being properly loaded. Try to refresh the page.";
+    emptyMessage.classList.add("error-message");
+    document.getElementById("news-list").appendChild(emptyMessage);
+    
     }
 });
 
