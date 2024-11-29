@@ -213,8 +213,7 @@ function displayNews(data) {
     }
 
     const validArticles = getValidArticles(articlesToDisplay);
-
-    validArticles.forEach((article) => { 
+    articlesToDisplay.forEach((article) => { 
         createNewsElement(
             article.title,
             article.description,
