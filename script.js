@@ -1,7 +1,7 @@
 // script.js
 import { API_KEY, API_KEY_GUARDIAN } from "./config.js";
 import { translateGuardianNews } from "./utils.js";
-import { getCategoryApiUrl, storeArticlesArrayInLocalStorage } from "./data.js";
+import { getCategoryApiUrl, storeArticlesArrayInLocalStorage, getCategoriesFromAPI } from "./data.js";
 
 const apiKey = API_KEY;
 const apiKeyGuardian = API_KEY_GUARDIAN;
@@ -17,6 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!categoriesInLocalStorage) { // if there are no locally saved, then fetch them all and add to local storage
         fetchAllCategories();
     }
+    const categoriesApiEndpoint = getCategoriesFromAPI();
+    console.log("categoriesApiEndpoint: ", categoriesApiEndpoint);
+    
     const savedCategory = localStorage.getItem("savedSelectedCategory") || savedSelectedCategory;
     categoryFilterDropdown.value = savedCategory;
     displayNews(savedCategory);
@@ -282,15 +285,15 @@ function displayNews(data) {
 
 function createInfoModal(article) {
     const modal = document.getElementById("moreInfoModal");
-    let articleContent = article.content;
+    let articleContent = article.content || "";
     //if the content contain the word " [+", remove it
-    if (articleContent.includes(" [+")) { //todo: fix this //rebecca
-        articleContent = article.content.split(" [+")[0];// Remove everything after " [+"
+    if (article.source !== "The Guardian" && articleContent.includes(" [+")) { //todo: fix this //rebecca
+        articleContent = articleContent.split(" [+")[0];// Remove everything after " [+"
     }
 
     // If the first 10 words of content and description are the same, remove the description //todo check what this returns in console log //rebecca
-    const contentWords = articleContent.split(/\s+/).slice(0, 10).join(" ");
-    const descriptionWords = article.description.split(/\s+/).slice(0, 10).join(" ");
+    const contentWords = (articleContent || "").split(/\s+/).slice(0, 10).join(" ");
+    const descriptionWords = (article.description || "").split(/\s+/).slice(0, 10).join(" ");
     console.log("contentwords, what is returned? : ", contentWords);
     console.log("descriptionWords, what is returned? : ", descriptionWords);
     
@@ -305,7 +308,7 @@ function createInfoModal(article) {
     document.getElementById("modal-source").textContent = `Source: ${article.source}`;
     document.getElementById("modal-date").textContent = `Published: ${formatDate(article.date)}`;
     document.getElementById("modal-url").href = article.url; //! changed from urlNews //rebecca
-    document.getElementById("modal-image").src = article.urlToImage;    
+    document.getElementById("modal-image").src = article.urlToImage || "";    
 
     console.log("url to image:", article.urlToImage);
     // Show the modal
@@ -327,7 +330,7 @@ function createInfoModal(article) {
 
 // store array in localstorage
 async function fetchAllCategories() {
-    const categoriesArray = ["general", "technology", "sports", "science", "health", "entertainment", "business"];
+    const categoriesArray = ["culture", "general", "technology", "sports", "science", "health", "entertainment", "business"];
     console.log("Fetching all categories:", categoriesArray);
 
     await Promise.all(
@@ -382,6 +385,9 @@ searchButton.addEventListener("click", async () => {
     console.log("Valid articles after filtering:", validArticles);
 
     displayNews(validArticles); // Display the filtered articles
+
+    // Store in localStorage
+    storeArticlesArrayInLocalStorage(validArticles, "saved search");
 });
 
 
