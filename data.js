@@ -16,4 +16,4 @@ function storeArticlesArrayInLocalStorage(articles, key) {
     localStorage.setItem(key, JSON.stringify(articles));
 }
 
-export { getCategoryApiUrl, storeArticlesArrayInLocalStorage, getCategoriesFromAPI }
+export { getCategoryApiUrl, storeArticlesArrayInLocalStorage }
