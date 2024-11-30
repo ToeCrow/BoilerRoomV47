@@ -10,7 +10,6 @@ const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const newsList = document.getElementById("news-list"); // ul element
 
-let savedSelectedCategory = "general"; // Default category, can be changed by the user when filtering
 
 document.addEventListener("DOMContentLoaded", () => {
     const categoriesInLocalStorage = localStorage.getItem("general"); //! change to check all different keys
@@ -18,11 +17,22 @@ document.addEventListener("DOMContentLoaded", () => {
         fetchAllCategories();
     }
 
-    
-    const savedCategory = localStorage.getItem("savedSelectedCategory") || savedSelectedCategory;
+   /*  const searchInLocalStorage = localStorage.getItem("saved search");
+    if (searchInLocalStorage) {
+        
+    } */
+   const savedSearchTermInLS = localStorage.getItem("search term");
+   const savedSearchInLS = localStorage.getItem("saved search");
+   const savedCategory = localStorage.getItem("savedSelectedCategory");
+
+   if ((savedSearchTermInLS !== "") && (savedSearchInLS !== "")) {
+    searchInput.value = savedSearchTermInLS;
+    displayNews(JSON.parse(savedSearchInLS));
+   } else if (savedCategory) {
     categoryFilterDropdown.value = savedCategory;
     categoryFilterDropdown.value = savedCategory;
     displayNews(savedCategory);
+    }
 });
 
 // The code above adds an event listener to the document object.
@@ -455,9 +465,22 @@ async function fetchAllCategories() {
   };
 //! ....
 
+let searchTerm = searchInput.value;
 
 // event listener search
 searchButton.addEventListener("click", async () => {
+    
+    // save search term in variable 
+    searchTerm = searchInput.value;
+
+    localStorage.setItem("search term", searchTerm);
+    localStorage.setItem("savedSelectedCategory", "");
+
+    console.log("saved searchTerm: ", searchTerm);
+    
+    // reset the dropdown to default
+    categoryFilterDropdown.value = "";
+
     const urlSearch = searchNews();
     
     if (!urlSearch) {
@@ -509,18 +532,24 @@ async function fetchNewsFromUrls(urlNews) {
   const categoryFilterDropdown = document.getElementById("category-filter");
   const categoryFilterDropdown = document.getElementById("category-filter");
 
-  categoryFilterDropdown.addEventListener("change", (event) => {
+ /*  categoryFilterDropdown.addEventListener("change", (event) => {
     const selectedCategory = event.target.value;
     displayNews(JSON.parse(localStorage.getItem(selectedCategory)));
-  });
+  }); */
 
   
   categoryFilterDropdown.addEventListener("change", async (event) => {
     const selectedCategory = event.target.value;
     console.log(`Category filter changed to: ${selectedCategory}`);
 
+    localStorage.setItem("savedSelectedCategory", selectedCategory); // save selectedCategory to local storage
+    localStorage.setItem("search term", "");
+
     const localStorageKey = selectedCategory;
     const localStorageValue = JSON.parse(localStorage.getItem(localStorageKey));
+
+    // empty the search bar
+    searchInput.value = "";
 
     if (localStorageValue) {
         console.log(`Displaying articles from localStorage for category: ${selectedCategory}`);
