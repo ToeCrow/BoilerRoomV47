@@ -1,5 +1,8 @@
 // script.js
 import { API_KEY, API_KEY_GUARDIAN } from "./config.js";
+import { translateGuardianNews } from "./utils.js";
+import { getCategoryApiUrl } from "./data.js";
+
 const apiKey = API_KEY;
 const apiKeyGuardian = API_KEY_GUARDIAN;
 // Add the urlNews you want to retrieve data from
@@ -10,115 +13,108 @@ const newsList = document.getElementById("news-list"); // ul element
 let savedSelectedCategory = "general"; // Default category, can be changed by the user when filtering
 
 document.addEventListener("DOMContentLoaded", () => {
-    fetchAllCategories();
+    const categoriesInLocalStorage = localStorage.getItem("general"); //! change to check all different keys
+    if (!categoriesInLocalStorage) { // if there are no locally saved, then fetch them all and add to local storage
+        fetchAllCategories();
+    }
     const savedCategory = localStorage.getItem("savedSelectedCategory") || savedSelectedCategory;
     categoryFilter.value = savedCategory;
     displayNews(savedCategory);
-    
-}); 
+});
 
 // The code above adds an event listener to the document object.
 // When the "DOMContentLoaded" event is triggered, which is when the initial HTML document has been completely loaded and parsed,
 // the fetchAllCategories function is called.
 
 // async function fetchNews(urlNews) {
-async function fetchNews(urlNews) {
-    console.log("fetchNews running for url:", urlNews);
+    async function fetchNews(url) {
+        console.log(`Fetching news from URL: ${url}`);
+        try {
+            // Perform the fetch request
+            const response = await fetch(url);
     
-    try {
-        // GET-request
-        const response = await fetch(urlNews);
-
-        // Controlling fetching errors
-
-        if (!response.ok) {
+            // Handle HTTP response errors
+            if (!response.ok) {
+                const errorMessage = document.createElement("p");
+                errorMessage.classList.add("error-message");
+    
+                switch (response.status) {
+                    case 400:
+                        errorMessage.textContent = "Invalid request (400). Please check the URL.";
+                        console.error("Invalid request (400). Check your request parameters or syntax.");
+                        break;
+                    case 401:
+                        errorMessage.textContent = "Unauthorized access (401). Check your API key.";
+                        console.error("Unauthorized access (401). Ensure the API key is correct and has necessary permissions.");
+                        break;
+                    case 404:
+                        errorMessage.textContent = "Resource not found (404).";
+                        console.error("Resource not found (404). The requested URL or endpoint may not exist.");
+                        break;
+                    case 429:
+                        errorMessage.textContent = "Too many requests (429). API rate limit exceeded.";
+                        console.error("Too many requests (429). Ensure you adhere to the API usage limits.");
+                        break;
+                    case 500:
+                        errorMessage.textContent = "Server error (500). Try again later.";
+                        console.error("Server error (500). This issue is on the server's side.");
+                        break;
+                    default:
+                        errorMessage.textContent = "An unexpected error occurred. Please try again.";
+                        console.error(`Unexpected error (${response.status}). Review the API documentation or logs.`);
+                        break;
+                }
+    
+                // Show the error on the UI and return an empty array
+                newsList.innerHTML = ""; // Clear existing news items
+                newsList.appendChild(errorMessage); // Display error message to the user
+                return [];
+            }
+    
+            // Parse the JSON data
+            const data = await response.json();
+            console.log("Raw data fetched:", data);
+    
+            // Check if the response contains articles
+            if ((!data.articles || data.articles.length === 0) && (!data.response?.results || data.response.results.length === 0)) {
+                console.warn("No articles found in the response.");
+                const noResultsMessage = document.createElement("p");
+                noResultsMessage.classList.add("error-message");
+                noResultsMessage.textContent = "No articles found for your request. Try a different category or search term.";
+                newsList.innerHTML = ""; // Clear existing news items
+                newsList.appendChild(noResultsMessage); // Display a no-results message to the user
+                return [];
+            }
+    
+            // Process Guardian API responses through `translateGuardianNews()`
+            if (url.includes("content.guardianapis.com")) {
+                console.log("Processing Guardian API data through translateGuardianNews()");
+                const translatedArticles = translateGuardianNews(data.response.results);
+                console.log("Translated Guardian articles:", translatedArticles);
+                return translatedArticles;
+            }
+    
+            // Return articles for other APIs (e.g., News API)
+            console.log("Articles fetched from News API:", data.articles);
+            return data.articles || [];
+        } catch (error) {
+            // Log any fetch or parsing errors
+            console.error("Error during fetchNews execution:", error);
+    
+            // Show a generic error message to the user
             const errorMessage = document.createElement("p");
             errorMessage.classList.add("error-message");
-
-            switch (response.status) {
-                case 400:
-                    errorMessage.textContent = "Oops! Something went wrong with your request. Please check the URL and try again.";
-                    console.error("Invalid request (400). Check your URL.");
-                    break;
-                    
-                case 401:
-                    errorMessage.textContent = "Access denied. Please check your API key and try again.";
-                    console.error("Unauthorized access (401). Invalid API key.");
-                    break;
-                    
-                case 404:
-                    errorMessage.textContent = "We couldn't find what you're looking for. Please check the URL and try again.";
-                    console.error("Resource not found (404).");
-                    break;
-                    
-                case 429:
-                    errorMessage.textContent = "You're making too many requests! Please wait a while before trying again.";
-                    console.error("Too many requests (429). Max limit of 1000 searches per day reached.");
-                    break;
-                    
-                case 500:
-                    errorMessage.textContent = "Something went wrong on our end. Please try again later.";
-                    console.error("Server error (500). Try again later.");
-                    break;
-            
-                default:
-                    errorMessage.textContent = "An unexpected error occurred. Please try again.";
-                    console.error(`Unexpected error (${response.status}).`);
-                    break;
-            }
-            
-
+            errorMessage.textContent = "An error occurred while fetching the news. Please check your internet connection and try again.";
             newsList.innerHTML = ""; // Clear existing news items
-            newsList.appendChild(errorMessage);
-
-            throw new Error(errorMessage.textContent);
+            newsList.appendChild(errorMessage); // Display error message to the user
+            return [];
         }
-
-        // Parse JSON-data
-        const data = await response.json();
-
-        // Manage cases where API returns no results
-        if (!data || !data.articles || data.articles.length === 0) {
-            console.log("No results found for your search.");
-            
-            newsList.innerHTML = ""; // Clear existing news items
-
-            const emptyMessage = document.createElement("p");
-            emptyMessage.textContent = "No results found for your search";
-            newsList.appendChild(emptyMessage);
-            return "No results found for your search.";
-        }
-
-
-       /*  displayNews(data.articles); */
-
-        
-        console.log("fetchNews output inside: ", data.articles);
-        
-        return data.articles; //  returns articles as JS list
-        
-        
-
-    } catch (error) {
-        // Log the error for development or show user-friendly error message
-        console.error("An error occurred:", error.message);
-        return error.message;
     }
-}
+    
 
 // function translate Guardian API results to API News format
-function translateGuardianNews(data) {
-    const translatedData = data.map((article) => ({
-        title: article.webTitle,
-        description: article.fields.bodyText,
-        name: "The Guardian",
-        url: article.webUrl,
-        publishedAt: article.webPublicationDate,
-        image: article.fields.thumbnail,
-        urlNews: article.webUrl,
-    }));
-    return translatedData;
-}
+
+
 
     //uppdate formatdate
  function formatDate(publishedAt) {
@@ -171,6 +167,24 @@ function searchNews() {
 
 
 
+function getValidArticles(articles) {
+    return articles.filter(article => {
+        const isValid = 
+            article.title && 
+            article.description && 
+            article.publishedAt && 
+            article.urlNews && 
+            !article.title.includes("[Removed]") && 
+            !article.description.includes("[Removed]"); // && 
+            // !(article.source && article.source.name && article.source.name.includes("[Removed]"));
+
+        if (!isValid) {
+            console.warn("Ogiltig eller borttagen artikel ignorerad:", article);
+        }
+        return isValid;
+    });
+}
+
 function displayNews(data) {
     console.log(newsList);
     const categorySelect = document.getElementById("category-filter");
@@ -190,27 +204,14 @@ function displayNews(data) {
         }
     }
 
-  const validArticles = articlesToDisplay.filter(article => {
-    const isValid = 
-        article.title && 
-        article.description && 
-        article.publishedAt && 
-        article.urlNews && 
-        !article.title.includes("[Removed]") && 
-        !article.description.includes("[Removed]"); // && 
-        // !(article.source && article.source.name && article.source.name.includes("[Removed]"));
+    const validArticles = getValidArticles(articlesToDisplay);
 
-    if (!isValid) {
-        console.warn("Ogiltig eller borttagen artikel ignorerad:", article);
-    }
-    return isValid;
-});
-
-    articlesToDisplay.forEach((article) => { 
+    validArticles.forEach((article) => { 
         createNewsElement(
             article.title,
             article.description,
-            article.source.name,
+           /*  article.source.name, */
+            article.name,
             article.publishedAt,
             article.urlNews,
             article.content, // Pass content only to the modal
@@ -273,12 +274,14 @@ function displayNews(data) {
 
 function createInfoModal(article) {
     const modal = document.getElementById("moreInfoModal");
-
-    // Clean up the content
-    const cleanedContent = article.content.split(" [+")[0]; // Remove everything after " [+"
+    const articleContent = article.content;
+    //if the content contain the word " [+", remove it
+    if (articleContent.includes(" [+")) {
+        articleContent = article.content.split(" [+")[0];// Remove everything after " [+"
+    }
 
     // If the first 10 words of content and description are the same, remove the description
-    const contentWords = article.content.split(/\s+/).slice(0, 10).join(" ");
+    const contentWords = articleContent.split(/\s+/).slice(0, 10).join(" ");
     const descriptionWords = article.description.split(/\s+/).slice(0, 10).join(" ");
     if (contentWords === descriptionWords) {
         article.description = "";
@@ -287,7 +290,7 @@ function createInfoModal(article) {
     // Populate modal with article details
     document.getElementById("modal-title").textContent = article.title;
     document.getElementById("modal-description").textContent = article.description || "No description available."; // Display description
-    document.getElementById("modal-content").textContent = cleanedContent; // Display cleaned content
+    document.getElementById("modal-content").textContent = articleContent; 
     document.getElementById("modal-source").textContent = `Source: ${article.source}`;
     document.getElementById("modal-date").textContent = `Published: ${formatDate(article.date)}`;
     document.getElementById("modal-urlNews").href = article.urlNews;
@@ -312,19 +315,32 @@ function createInfoModal(article) {
 }
 
 // store array in localstorage
-function fetchAllCategories() {
+async function fetchAllCategories() {
     const categoriesArray = ["general", "technology", "sports", "science", "health", "entertainment", "business"];
-    
-    async function fetchCategoriesArray() {
-        await Promise.all(categoriesArray.map(async (category) => {
-            const urlCategory = await categorySearch(category);
-            const articles = await fetchNews(urlCategory);
-            storeArticlesArrayInLocalStorage(articles, category);
-        }));
-    }
-    fetchCategoriesArray();
+    console.log("Fetching all categories:", categoriesArray);
 
+    await Promise.all(
+        categoriesArray.map(async (category) => {
+            // Fetch from News API
+            const newsApiUrl = getCategoryApiUrl(category, "newsapi");
+            console.log(`Fetching News API for category ${category}: ${newsApiUrl}`);
+            const newsApiArticles = await fetchNews(newsApiUrl);
+
+            // Fetch from Guardian API
+            const guardianApiUrl = getCategoryApiUrl(category, "guardian");
+            console.log(`Fetching Guardian API for category ${category}: ${guardianApiUrl}`);
+            const guardianApiArticles = await fetchNews(guardianApiUrl);
+
+            // Combine articles from both APIs
+            const combinedArticles = [...newsApiArticles, ...guardianApiArticles];
+            console.log(`Combined articles for category ${category}:`, combinedArticles);
+
+            // Store in localStorage
+            storeArticlesArrayInLocalStorage(combinedArticles, category);
+        })
+    );
 }
+
 
 function storeArticlesArrayInLocalStorage(articles, key) {
     localStorage.setItem(key, JSON.stringify(articles));
@@ -337,6 +353,7 @@ function storeArticlesArrayInLocalStorage(articles, key) {
     console.log("categoryFetch: ", categoryFetch);
     return categoryFetch;
   };
+
 
 
 // event listener search
@@ -362,18 +379,54 @@ searchButton.addEventListener("click", () => {
 
   const categoryFilter = document.getElementById("category-filter");
 
-  categoryFilter.addEventListener("change", filterNews);
+  categoryFilter.addEventListener("change", (event) => {
+    const selectedCategory = event.target.value;
+    displayNews(JSON.parse(localStorage.getItem(selectedCategory)));
+  });
 
   
-  function filterNews(event) {
+  categoryFilter.addEventListener("change", async (event) => {
+    const selectedCategory = event.target.value;
+    console.log(`Category filter changed to: ${selectedCategory}`);
 
-    //   currentPage = 1; // Reset to the first page
-  const selectedCategory = event.target.value;
-    let filteredFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
-    fetchNews(filteredFetch);
-    console.log("filteredFetch: ", filteredFetch);
-    return filteredFetch;
-  };
+    const localStorageKey = selectedCategory;
+    const localStorageValue = JSON.parse(localStorage.getItem(localStorageKey));
+
+    if (localStorageValue) {
+        console.log(`Displaying articles from localStorage for category: ${selectedCategory}`);
+        displayNews(localStorageValue);
+    } else {
+        console.log(`Fetching articles for category ${selectedCategory} from APIs.`);
+        const newsApiUrl = getCategoryApiUrl(selectedCategory, "newsapi");
+        const guardianApiUrl = getCategoryApiUrl(selectedCategory, "guardian");
+
+        const [newsApiArticles, guardianApiArticles] = await Promise.all([
+            fetchNews(newsApiUrl),
+            fetchNews(guardianApiUrl)
+        ]);
+
+        const combinedArticles = [...newsApiArticles, ...guardianApiArticles];
+        console.log(`Combined articles for category ${selectedCategory}:`, combinedArticles);
+
+        // Save to localStorage for faster future access
+        storeArticlesArrayInLocalStorage(combinedArticles, selectedCategory);
+
+        // Display articles
+        displayNews(combinedArticles);
+    }
+});
+
+//! not currently in use
+function sortArticlesByDate(articles) {
+    return articles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+}
+
+/* // Example usage:
+const combinedArticles = [...newsApiArticles, ...guardianApiArticles];
+const sortedArticles = sortArticlesByDate(combinedArticles);
+displayNews(sortedArticles);
+ */
+//! ....
 
 //   fetchtimer (10 minuter)
 let isFetching = false;
@@ -388,3 +441,5 @@ function fetchNewsTimer() {
 }
 
 setInterval(fetchNewsTimer, 600000);
+
+
