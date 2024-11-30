@@ -251,22 +251,28 @@ function searchNews() {
 
 
 function getValidArticles(articles) {
+    if (!Array.isArray(articles)) {
+        console.error("Expected an array, but got:", articles);
+        return []; // Return an empty array to avoid further errors
+    }
+
     return articles.filter(article => {
-        const isValid = 
-            article.title && 
-            (article.description || article.content) && 
-            article.publishedAt &&  
-            article.url && 
-            !article.title.includes("[Removed]") && 
-            !article.description.includes("[Removed]"); // && 
-            // !(article.source && article.source.name && article.source.name.includes("[Removed]"));
+        const isValid =
+            article.title &&
+            (article.description || article.content) &&
+            article.publishedAt &&
+            article.url &&
+            !article.title.includes("[Removed]") &&
+            !article.description?.includes("[Removed]");
 
         if (!isValid) {
-            console.warn("Ogiltig eller borttagen artikel ignorerad:", article);
+            console.warn("Invalid or removed article ignored:", article);
         }
         return isValid;
     });
 }
+
+
 
 function displayNews(data) {
     console.log(newsList);
@@ -278,6 +284,9 @@ function displayNews(data) {
 
     let articlesToDisplay = data;
 
+    if (searchInput.value) {
+        articlesToDisplay = data;
+    } else if (categoryIsSelected) {
     if (searchInput.value) {
         articlesToDisplay = data;
     } else if (categoryIsSelected) {
@@ -459,19 +468,21 @@ async function fetchAllCategories() {
 searchButton.addEventListener("click", async () => {
     const urlSearch = searchNews();
     
-    if (!urlNews) {
-      console.log("No valid urlNews to fetch data from.");
-      return; // Stops if no valid urlNews
-    }  
+    if (!urlSearch) {
+        console.log("No valid urlNews to fetch data from.");
+        return; // Stops if no valid urlSearch
+    }
 
-    const fetchedArticles = fetchNewsFromUrls(); // ! here
-    getValidArticles(fetchedArticles);
-    //store all articles in an array 
-    const articles = temporaryArticlesArray(fetchedArticles);
-    console.log("temporaryArticlesArray: ", temporaryArticlesArray);
-    
-    displayNews(articles);
+    console.log("Fetching articles from search URLs...");
+    const fetchedArticles = await fetchNewsFromUrls(urlSearch); // Await the resolution of the promise
+    console.log("Fetched articles:", fetchedArticles);
+
+    const validArticles = getValidArticles(fetchedArticles); // Pass resolved articles to the filtering function
+    console.log("Valid articles after filtering:", validArticles);
+
+    displayNews(validArticles); // Display the filtered articles
 });
+
 
 function temporaryArticlesArray(articles) {
     const temporaryArticlesArray = [];
@@ -483,11 +494,19 @@ function temporaryArticlesArray(articles) {
     return temporaryArticlesArray;
 }
 
-async function fetchNewsFromUrls() {
+async function fetchNewsFromUrls(urlNews) {
+    const results = [];
     for (const url of urlNews) {
-        await fetchNews(url);
+        const articles = await fetchNews(url); // Await the fetchNews function
+        if (Array.isArray(articles)) {
+            results.push(...articles); // Add the fetched articles to the results array
+        } else {
+            console.warn("Non-array response from fetchNews:", articles);
+        }
     }
+    return results; // Return the combined array of articles
 }
+
 
 
 // FILTER
