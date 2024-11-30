@@ -444,7 +444,7 @@ async function fetchAllCategories() {
     console.log("categoryFetch: ", categoryFetch);
     return categoryFetch;
   };
-
+//! ....
 
 
 // event listener search
