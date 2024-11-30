@@ -11,17 +11,6 @@ function getCategoryApiUrl(category, api) {
     throw new Error(`Unsupported API: ${api}`);
 }
 
-const endpointGuardianAPI = "https://content.guardianapis.com/sections";
-function getCategoriesFromAPI(api) {
-    if (api === "guardian") {
-        return fetch(endpointGuardianAPI)
-            .then(response => response.json())
-            .then(data => data.response.sections);
-    } else if (api === "newsapi") {
-        return Promise.resolve(["general", "technology", "sports", "science", "health", "entertainment", "business"]);
-    }
-    throw new Error(`Unsupported API: ${api}`);
-}
 
 function storeArticlesArrayInLocalStorage(articles, key) {
     localStorage.setItem(key, JSON.stringify(articles));

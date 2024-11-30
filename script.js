@@ -330,7 +330,7 @@ function createInfoModal(article) {
 
 // store array in localstorage
 async function fetchAllCategories() {
-    const categoriesArray = ["culture", "general", "technology", "sports", "science", "health", "entertainment", "business"];
+    const categoriesArray = ["culture", "general", "technology", "sports", "science", "health", "entertainment", "business"]; //todo remove culture if we are only displaying "top news, also remove from dropdown in HTML"
     console.log("Fetching all categories:", categoriesArray);
 
     await Promise.all(
