@@ -1,7 +1,7 @@
 // script.js
 import { API_KEY, API_KEY_GUARDIAN } from "./config.js";
 import { translateGuardianNews } from "./utils.js";
-import { getCategoryApiUrl, storeArticlesArrayInLocalStorage, getCategoriesFromAPI } from "./data.js";
+import { getCategoryApiUrl, storeArticlesArrayInLocalStorage } from "./data.js";
 
 const apiKey = API_KEY;
 const apiKeyGuardian = API_KEY_GUARDIAN;
@@ -17,8 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!categoriesInLocalStorage) { // if there are no locally saved, then fetch them all and add to local storage
         fetchAllCategories();
     }
-    const categoriesApiEndpoint = getCategoriesFromAPI();
-    console.log("categoriesApiEndpoint: ", categoriesApiEndpoint);
+
     
     const savedCategory = localStorage.getItem("savedSelectedCategory") || savedSelectedCategory;
     categoryFilterDropdown.value = savedCategory;
