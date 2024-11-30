@@ -1,7 +1,7 @@
 // script.js
 import { API_KEY, API_KEY_GUARDIAN } from "./config.js";
 import { translateGuardianNews } from "./utils.js";
-import { getCategoryApiUrl } from "./data.js";
+import { getCategoryApiUrl, storeArticlesArrayInLocalStorage } from "./data.js";
 
 const apiKey = API_KEY;
 const apiKeyGuardian = API_KEY_GUARDIAN;
@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fetchAllCategories();
     }
     const savedCategory = localStorage.getItem("savedSelectedCategory") || savedSelectedCategory;
-    categoryFilter.value = savedCategory;
+    categoryFilterDropdown.value = savedCategory;
     displayNews(savedCategory);
 });
 
@@ -276,13 +276,16 @@ function createInfoModal(article) {
     const modal = document.getElementById("moreInfoModal");
     const articleContent = article.content;
     //if the content contain the word " [+", remove it
-    if (articleContent.includes(" [+")) {
+    if (articleContent.textContent(" [+")) { //todo: fix this //rebecca
         articleContent = article.content.split(" [+")[0];// Remove everything after " [+"
     }
 
-    // If the first 10 words of content and description are the same, remove the description
+    // If the first 10 words of content and description are the same, remove the description //todo check what this returns in console log //rebecca
     const contentWords = articleContent.split(/\s+/).slice(0, 10).join(" ");
     const descriptionWords = article.description.split(/\s+/).slice(0, 10).join(" ");
+    console.log("contentwords, what is returned? : ", contentWords);
+    console.log("descriptionWords, what is returned? : ", descriptionWords);
+    
     if (contentWords === descriptionWords) {
         article.description = "";
     }
@@ -342,10 +345,8 @@ async function fetchAllCategories() {
 }
 
 
-function storeArticlesArrayInLocalStorage(articles, key) {
-    localStorage.setItem(key, JSON.stringify(articles));
-}
 
+//! not in use  ???
  function categorySearch(category) {
     const selectedCategory = category;
     let categoryFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
@@ -377,15 +378,15 @@ searchButton.addEventListener("click", () => {
 
 // FILTER
 
-  const categoryFilter = document.getElementById("category-filter");
+  const categoryFilterDropdown = document.getElementById("category-filter");
 
-  categoryFilter.addEventListener("change", (event) => {
+  categoryFilterDropdown.addEventListener("change", (event) => {
     const selectedCategory = event.target.value;
     displayNews(JSON.parse(localStorage.getItem(selectedCategory)));
   });
 
   
-  categoryFilter.addEventListener("change", async (event) => {
+  categoryFilterDropdown.addEventListener("change", async (event) => {
     const selectedCategory = event.target.value;
     console.log(`Category filter changed to: ${selectedCategory}`);
 
