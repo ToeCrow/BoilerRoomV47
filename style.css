@@ -216,7 +216,7 @@ label {
     justify-content: center;
     align-items: center;
     background: rgba(0, 0, 0, 0.6);
-    z-index: 1000;
+    z-index: 1000; /* placed on top of other content */
     transition: opacity 0.3s ease;
 }
 
