@@ -171,9 +171,9 @@ function getValidArticles(articles) {
     return articles.filter(article => {
         const isValid = 
             article.title && 
-            article.description && 
-            article.publishedAt && 
-            article.urlNews && 
+            (article.description || article.content) && 
+            article.publishedAt &&  
+            article.url && 
             !article.title.includes("[Removed]") && 
             !article.description.includes("[Removed]"); // && 
             // !(article.source && article.source.name && article.source.name.includes("[Removed]"));
@@ -210,19 +210,19 @@ function displayNews(data) {
         createNewsElement(
             article.title,
             article.description,
-           /*  article.source.name, */
-            article.name,
+            article.source.name,
+            /* article.name, */
             article.publishedAt,
-            article.urlNews,
+            article.url,
             article.content, // Pass content only to the modal
-            article.urlNewsToImage // Pass content only to the modal
+            article.urlToImage // Pass content only to the modal
         );
     });
 
 }
 
 
-  function createNewsElement(title, description, source, date, urlNews, content, urlNewsToImage) {
+  function createNewsElement(title, description, source, date, url, content, urlToImage) {
     const newsItem = document.createElement("li");
     newsItem.classList.add("news-item");
   
@@ -255,8 +255,8 @@ function displayNews(data) {
             content: content, // Content passed to modal
             source: source,
             date: date,
-            urlNews: urlNews,
-            urlNewsToImage: urlNewsToImage
+            url: url,
+            urlToImage: urlToImage
             
         });
     });
@@ -274,9 +274,9 @@ function displayNews(data) {
 
 function createInfoModal(article) {
     const modal = document.getElementById("moreInfoModal");
-    const articleContent = article.content;
+    let articleContent = article.content;
     //if the content contain the word " [+", remove it
-    if (articleContent.textContent(" [+")) { //todo: fix this //rebecca
+    if (articleContent.includes(" [+")) { //todo: fix this //rebecca
         articleContent = article.content.split(" [+")[0];// Remove everything after " [+"
     }
 
@@ -296,10 +296,10 @@ function createInfoModal(article) {
     document.getElementById("modal-content").textContent = articleContent; 
     document.getElementById("modal-source").textContent = `Source: ${article.source}`;
     document.getElementById("modal-date").textContent = `Published: ${formatDate(article.date)}`;
-    document.getElementById("modal-urlNews").href = article.urlNews;
-    document.getElementById("modal-image").src = article.urlNewsToImage;    
+    document.getElementById("modal-url").href = article.url; //! changed from urlNews //rebecca
+    document.getElementById("modal-image").src = article.urlToImage;    
 
-    console.log("urlNews to image:", article.urlNewsToImage);
+    console.log("url to image:", article.urlToImage);
     // Show the modal
     modal.classList.remove("hidden");
 
@@ -366,14 +366,31 @@ searchButton.addEventListener("click", () => {
       console.log("No valid urlNews to fetch data from.");
       return; // Stops if no valid urlNews
     }  
-    async function fetchNewsFromUrls() {
-        for (const url of urlNews) {
-            await fetchNews(url);
-        }
-    }
-    const articles = fetchNewsFromUrls();
+
+    const fetchedArticles = fetchNewsFromUrls(); // ! here
+    getValidArticles(fetchedArticles);
+    //store all articles in an array 
+    const articles = temporaryArticlesArray(fetchedArticles);
+    console.log("temporaryArticlesArray: ", temporaryArticlesArray);
+    
     displayNews(articles);
 });
+
+function temporaryArticlesArray(articles) {
+    const temporaryArticlesArray = [];
+    for (const article of articles) {
+        if (article.title) {
+            temporaryArticlesArray.push(article);
+        }
+    }
+    return temporaryArticlesArray;
+}
+
+async function fetchNewsFromUrls() {
+    for (const url of urlNews) {
+        await fetchNews(url);
+    }
+}
 
 
 // FILTER
