@@ -254,9 +254,9 @@ function getValidArticles(articles) {
     return articles.filter(article => {
         const isValid = 
             article.title && 
-            article.description && 
-            article.publishedAt && 
-            article.urlNews && 
+            (article.description || article.content) && 
+            article.publishedAt &&  
+            article.url && 
             !article.title.includes("[Removed]") && 
             !article.description.includes("[Removed]"); // && 
             // !(article.source && article.source.name && article.source.name.includes("[Removed]"));
@@ -295,11 +295,13 @@ function displayNews(data) {
         createNewsElement(
             article.title,
             article.description,
-           /*  article.source.name, */
-            article.name,
+            article.source.name,
+            /* article.name, */
             article.publishedAt,
             article.url,
+            article.url,
             article.content, // Pass content only to the modal
+            article.urlToImage // Pass content only to the modal
             article.urlToImage // Pass content only to the modal
         );
     });
@@ -307,6 +309,7 @@ function displayNews(data) {
 }
 
 
+  function createNewsElement(title, description, source, date, url, content, urlToImage) {
   function createNewsElement(title, description, source, date, url, content, urlToImage) {
     const newsItem = document.createElement("li");
     newsItem.classList.add("news-item");
@@ -342,6 +345,8 @@ function displayNews(data) {
             date: date,
             url: url,
             urlToImage: urlToImage
+            url: url,
+            urlToImage: urlToImage
             
         });
     });
@@ -359,9 +364,9 @@ function displayNews(data) {
 
 function createInfoModal(article) {
     const modal = document.getElementById("moreInfoModal");
-    const articleContent = article.content;
+    let articleContent = article.content;
     //if the content contain the word " [+", remove it
-    if (articleContent.textContent(" [+")) { //todo: fix this //rebecca
+    if (articleContent.includes(" [+")) { //todo: fix this //rebecca
         articleContent = article.content.split(" [+")[0];// Remove everything after " [+"
     }
 
@@ -387,7 +392,10 @@ function createInfoModal(article) {
     document.getElementById("modal-date").textContent = `Published: ${formatDate(article.date)}`;
     document.getElementById("modal-url").href = article.url; //! changed from urlNews //rebecca
     document.getElementById("modal-image").src = article.urlToImage;    
+    document.getElementById("modal-url").href = article.url; //! changed from urlNews //rebecca
+    document.getElementById("modal-image").src = article.urlToImage;    
 
+    console.log("url to image:", article.urlToImage);
     console.log("url to image:", article.urlToImage);
     // Show the modal
     modal.classList.remove("hidden");
@@ -451,21 +459,19 @@ async function fetchAllCategories() {
 searchButton.addEventListener("click", async () => {
     const urlSearch = searchNews();
     
-    if (!urlSearch) {
-        console.log("No valid urlNews to fetch data from.");
-        return; // Stops if no valid urlSearch
-    }
+    if (!urlNews) {
+      console.log("No valid urlNews to fetch data from.");
+      return; // Stops if no valid urlNews
+    }  
 
-    console.log("Fetching articles from search URLs...");
-    const fetchedArticles = await fetchNewsFromUrls(urlSearch); // Await the resolution of the promise
-    console.log("Fetched articles:", fetchedArticles);
-
-    const validArticles = getValidArticles(fetchedArticles); // Pass resolved articles to the filtering function
-    console.log("Valid articles after filtering:", validArticles);
-
-    displayNews(validArticles); // Display the filtered articles
+    const fetchedArticles = fetchNewsFromUrls(); // ! here
+    getValidArticles(fetchedArticles);
+    //store all articles in an array 
+    const articles = temporaryArticlesArray(fetchedArticles);
+    console.log("temporaryArticlesArray: ", temporaryArticlesArray);
+    
+    displayNews(articles);
 });
-
 
 function temporaryArticlesArray(articles) {
     const temporaryArticlesArray = [];
@@ -477,19 +483,11 @@ function temporaryArticlesArray(articles) {
     return temporaryArticlesArray;
 }
 
-async function fetchNewsFromUrls(urlNews) {
-    const results = [];
+async function fetchNewsFromUrls() {
     for (const url of urlNews) {
-        const articles = await fetchNews(url); // Await the fetchNews function
-        if (Array.isArray(articles)) {
-            results.push(...articles); // Add the fetched articles to the results array
-        } else {
-            console.warn("Non-array response from fetchNews:", articles);
-        }
+        await fetchNews(url);
     }
-    return results; // Return the combined array of articles
 }
-
 
 
 // FILTER
