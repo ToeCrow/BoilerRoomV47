@@ -11,8 +11,4 @@ function getCategoryApiUrl(category, api) {
     throw new Error(`Unsupported API: ${api}`);
 }
 
-function storeArticlesArrayInLocalStorage(articles, key) {
-    localStorage.setItem(key, JSON.stringify(articles));
-}
-
-export { getCategoryApiUrl, storeArticlesArrayInLocalStorage }
+export { getCategoryApiUrl }
