@@ -231,7 +231,6 @@ function displayNews(data) {
             article.title,
             article.description,
             article.source.name,
-            /* article.name, */
             article.publishedAt,
             article.url,
             article.content, // Pass content only to the modal
@@ -454,9 +453,16 @@ async function fetchNewsFromUrls(urlNews) {
 
     localStorage.setItem("savedSelectedCategory", selectedCategory); // save selectedCategory to local storage
     localStorage.setItem("search term", "");
+    console.log(`Category filter changed to: ${selectedCategory}`);
+
+    localStorage.setItem("savedSelectedCategory", selectedCategory); // save selectedCategory to local storage
+    localStorage.setItem("search term", "");
 
     const localStorageKey = selectedCategory;
     const localStorageValue = JSON.parse(localStorage.getItem(localStorageKey));
+
+    // empty the search bar
+    searchInput.value = "";
 
     // empty the search bar
     searchInput.value = "";
@@ -510,5 +516,3 @@ function fetchNewsTimer() {
 }
 
 setInterval(fetchNewsTimer, 600000);
-
-
