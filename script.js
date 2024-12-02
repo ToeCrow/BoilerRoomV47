@@ -35,89 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// The code above adds an event listener to the document object.
-// When the "DOMContentLoaded" event is triggered, which is when the initial HTML document has been completely loaded and parsed,
-// the fetchAllCategories function is called.
 
-// async function fetchNews(urlNews) {
-    async function fetchNews(url) {
-        console.log(`Fetching news from URL: ${url}`);
-        try {
-            // Perform the fetch request
-            const response = await fetch(url);
-    
-            // Handle HTTP response errors
-            if (!response.ok) {
-                const errorMessage = document.createElement("p");
-                errorMessage.classList.add("error-message");
-    
-                switch (response.status) {
-                    case 400:
-                        errorMessage.textContent = "Invalid request (400). Please check the URL.";
-                        console.error("Invalid request (400). Check your request parameters or syntax.");
-                        break;
-                    case 401:
-                        errorMessage.textContent = "Unauthorized access (401). Check your API key.";
-                        console.error("Unauthorized access (401). Ensure the API key is correct and has necessary permissions.");
-                        break;
-                    case 404:
-                        errorMessage.textContent = "Resource not found (404).";
-                        console.error("Resource not found (404). The requested URL or endpoint may not exist.");
-                        break;
-                    case 429:
-                        errorMessage.textContent = "Too many requests (429). API rate limit exceeded.";
-                        console.error("Too many requests (429). Ensure you adhere to the API usage limits.");
-                        break;
-                    case 500:
-                        errorMessage.textContent = "Server error (500). Try again later.";
-                        console.error("Server error (500). This issue is on the server's side.");
-                        break;
-                    default:
-                        errorMessage.textContent = "An unexpected error occurred. Please try again.";
-                        console.error(`Unexpected error (${response.status}). Review the API documentation or logs.`);
-                        break;
-                }
-    
-                // Show the error on the UI and return an empty array
-                newsList.innerHTML = ""; // Clear existing news items
-                newsList.appendChild(errorMessage); // Display error message to the user
-                return [];
-            }
-    
-            // Parse the JSON data
-            const data = await response.json();
-            console.log("Raw data fetched:", data);
-    
-            // Check if the response contains articles
-            if ((!data.articles || data.articles.length === 0) && (!data.response?.results || data.response.results.length === 0)) {
-                console.warn("No articles found in the response.");
-                const noResultsMessage = document.createElement("p");
-                noResultsMessage.classList.add("error-message");
-                noResultsMessage.textContent = "No articles found for your request. Try a different category or search term.";
-                newsList.innerHTML = ""; // Clear existing news items
-                newsList.appendChild(noResultsMessage); // Display a no-results message to the user
-                return [];
-            }
-    
-            // Process Guardian API responses through `translateGuardianNews()`
-            if (url.includes("content.guardianapis.com")) {
-                console.log("Processing Guardian API data through translateGuardianNews()");
-                const translatedArticles = translateGuardianNews(data.response.results);
-                console.log("Translated Guardian articles:", translatedArticles);
-                return translatedArticles;
-            }
-    
-            // Return articles for other APIs (e.g., News API)
-            console.log("Articles fetched from News API:", data.articles);
-            return data.articles || [];
-        } catch (error) {
-            // Log any fetch or parsing errors
-            console.error("Error during fetchNews execution:", error);
-    
-            // Show a generic error message to the user
-            const errorMessage = document.createElement("p");
-            errorMessage.classList.add("error-message");
-            errorMessage.textContent = "An error occurred while fetching the news. Please check your internet connection and try again.";
     async function fetchNews(url) {
         console.log(`Fetching news from URL: ${url}`);
         try {
@@ -316,17 +234,15 @@ function displayNews(data) {
             /* article.name, */
             article.publishedAt,
             article.url,
-            article.url,
             article.content, // Pass content only to the modal
-            article.urlToImage // Pass content only to the modal
             article.urlToImage // Pass content only to the modal
         );
     });
 
-}
+}}
 
 
-  function createNewsElement(title, description, source, date, url, content, urlToImage) {
+
   function createNewsElement(title, description, source, date, url, content, urlToImage) {
     const newsItem = document.createElement("li");
     newsItem.classList.add("news-item");
@@ -360,8 +276,6 @@ function displayNews(data) {
             content: content, // Content passed to modal
             source: source,
             date: date,
-            url: url,
-            urlToImage: urlToImage
             url: url,
             urlToImage: urlToImage
             
@@ -502,16 +416,6 @@ searchButton.addEventListener("click", async () => {
 });
 
 
-function temporaryArticlesArray(articles) {
-    const temporaryArticlesArray = [];
-    for (const article of articles) {
-        if (article.title) {
-            temporaryArticlesArray.push(article);
-        }
-    }
-    return temporaryArticlesArray;
-}
-
 async function fetchNewsFromUrls(urlNews) {
     const results = [];
     for (const url of urlNews) {
@@ -529,13 +433,8 @@ async function fetchNewsFromUrls(urlNews) {
 
 // FILTER
 
-  const categoryFilterDropdown = document.getElementById("category-filter");
-  const categoryFilterDropdown = document.getElementById("category-filter");
 
- /*  categoryFilterDropdown.addEventListener("change", (event) => {
-    const selectedCategory = event.target.value;
-    displayNews(JSON.parse(localStorage.getItem(selectedCategory)));
-  }); */
+  const categoryFilterDropdown = document.getElementById("category-filter");
 
   
   categoryFilterDropdown.addEventListener("change", async (event) => {
