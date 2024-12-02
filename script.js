@@ -208,7 +208,7 @@ function displayNews(data) {
     const categorySelect = document.getElementById("category-filter");
 
     const categoryIsSelected = categorySelect.value;
-    
+
     newsList.innerHTML = ""; // Clear existing news items
 
     let articlesToDisplay = data;
@@ -233,8 +233,8 @@ function displayNews(data) {
             article.source.name,
             article.publishedAt,
             article.url,
-            article.content, // Pass content only to the modal
-            article.urlToImage // Pass content only to the modal
+            article.content || "", // Pass empty string if content is null
+            article.urlToImage || "" // Pass empty string if urlToImage is null
         );
     });
 
