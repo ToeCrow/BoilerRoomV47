@@ -6,7 +6,14 @@ function getCategoryApiUrl(category, api) {
     if (api === "newsapi") {
         return `https://newsapi.org/v2/top-headlines?category=${category}&apiKey=${apiKey}`;
     } else if (api === "guardian") {
-        return `https://content.guardianapis.com/search?section=${category}&page-size=10&api-key=${apiKeyGuardian}`; //max 10 articles
+        if (category === "entertainment") {
+            let newCategory = "tv-and-radio";
+            return `https://content.guardianapis.com/search?section=${newCategory}&page-size=10&api-key=${apiKeyGuardian}`; //max 10 articles
+
+        } else {
+            return `https://content.guardianapis.com/search?section=${category}&page-size=10&api-key=${apiKeyGuardian}`; //max 10 articles
+        }
+        
     }
     throw new Error(`Unsupported API: ${api}`);
 }
