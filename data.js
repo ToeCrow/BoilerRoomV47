@@ -6,8 +6,12 @@ function getCategoryApiUrl(category, api) {
     if (api === "newsapi") {
         return `https://newsapi.org/v2/top-headlines?category=${category}&apiKey=${apiKey}`;
     } else if (api === "guardian") {
-        if (category === "entertainment") {
+        if (category === "entertainment" ) {
             let newCategory = "tv-and-radio";
+            return `https://content.guardianapis.com/search?section=${newCategory}&page-size=10&api-key=${apiKeyGuardian}`; //max 10 articles
+
+        } else if (category === "sports" ) {
+            let newCategory = "sport";
             return `https://content.guardianapis.com/search?section=${newCategory}&page-size=10&api-key=${apiKeyGuardian}`; //max 10 articles
 
         } else {
