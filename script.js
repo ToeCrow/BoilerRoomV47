@@ -17,10 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
         fetchAllCategories();
     }
 
-   /*  const searchInLocalStorage = localStorage.getItem("saved search");
-    if (searchInLocalStorage) {
-        
-    } */
    const savedSearchTermInLS = localStorage.getItem("search term");
    const savedSearchInLS = localStorage.getItem("saved search");
    const savedCategory = localStorage.getItem("savedSelectedCategory");
