@@ -364,17 +364,6 @@ async function fetchAllCategories() {
 }
 
 
-
-//! not in use  ???
- function categorySearch(category) {
-    const selectedCategory = category;
-    let categoryFetch = `https://newsapi.org/v2/top-headlines?category=${selectedCategory}&apiKey=${apiKey}`;
-
-    console.log("categoryFetch: ", categoryFetch);
-    return categoryFetch;
-  };
-//! ....
-
 let searchTerm = searchInput.value;
 
 // event listener search
@@ -412,16 +401,6 @@ searchButton.addEventListener("click", async () => {
 });
 
 
-function temporaryArticlesArray(articles) {
-    const temporaryArticlesArray = [];
-    for (const article of articles) {
-        if (article.title) {
-            temporaryArticlesArray.push(article);
-        }
-    }
-    return temporaryArticlesArray;
-}
-
 async function fetchNewsFromUrls(urlNews) {
     const results = [];
     for (const url of urlNews) {
@@ -434,8 +413,6 @@ async function fetchNewsFromUrls(urlNews) {
     }
     return results; // Return the combined array of articles
 }
-
-
 
 // FILTER
 
@@ -491,17 +468,6 @@ async function fetchNewsFromUrls(urlNews) {
     }
 });
 
-//! not currently in use
-function sortArticlesByDate(articles) {
-    return articles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
-}
-
-/* // Example usage:
-const combinedArticles = [...newsApiArticles, ...guardianApiArticles];
-const sortedArticles = sortArticlesByDate(combinedArticles);
-displayNews(sortedArticles);
- */
-//! ....
 
 //   fetchtimer (10 minuter)
 let isFetching = false;
