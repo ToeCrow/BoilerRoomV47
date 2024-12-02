@@ -43,30 +43,36 @@ document.addEventListener("DOMContentLoaded", () => {
     
                 switch (response.status) {
                     case 400:
-                        errorMessage.textContent = "Invalid request (400). Please check the URL.";
-                        console.error("Invalid request (400). Check your request parameters or syntax.");
+                        errorMessage.textContent = "Oops! Something went wrong with your request. An error has been sent to our IT. Please try again later.";
+                        console.error("Invalid request (400). Check your URL.");
                         break;
+                        
                     case 401:
-                        errorMessage.textContent = "Unauthorized access (401). Check your API key.";
-                        console.error("Unauthorized access (401). Ensure the API key is correct and has necessary permissions.");
+                        errorMessage.textContent = "Access denied. An error has been sent to our IT. Please try again later.";
+                        console.error("Unauthorized access (401). Invalid API key.");
                         break;
+                        
                     case 404:
-                        errorMessage.textContent = "Resource not found (404).";
-                        console.error("Resource not found (404). The requested URL or endpoint may not exist.");
+                        errorMessage.textContent = "We couldn't find what you're looking for. An error has been sent to our IT. Please try again later.";
+                        console.error("Resource not found (404).");
                         break;
+                        
                     case 429:
-                        errorMessage.textContent = "Too many requests (429). API rate limit exceeded.";
-                        console.error("Too many requests (429). Ensure you adhere to the API usage limits.");
+                        errorMessage.textContent = "You're making too many requests! Please wait a while before trying again.";
+                        console.error("Too many requests (429). Max limit of 1000 searches per day reached.");
                         break;
+                        
                     case 500:
-                        errorMessage.textContent = "Server error (500). Try again later.";
-                        console.error("Server error (500). This issue is on the server's side.");
+                        errorMessage.textContent = "Something went wrong on our end. An error has been sent to our IT. Please try again later.";
+                        console.error("Server error (500). Try again later.");
                         break;
+                
                     default:
                         errorMessage.textContent = "An unexpected error occurred. Please try again.";
-                        console.error(`Unexpected error (${response.status}). Review the API documentation or logs.`);
+                        console.error(`Unexpected error (${response.status}).`);
                         break;
                 }
+                
     
                 // Show the error on the UI and return an empty array
                 newsList.innerHTML = ""; // Clear existing news items
