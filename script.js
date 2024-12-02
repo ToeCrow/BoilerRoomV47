@@ -163,9 +163,6 @@ function searchNews() {
     return urlNews; // returns urlNews
 }
 
-//updated function to remove "removed" articles and invalid dates
-
-
 
 function getValidArticles(articles) {
     if (!Array.isArray(articles)) {
@@ -290,8 +287,7 @@ function createInfoModal(article) {
     // If the first 10 words of content and description are the same, remove the description //todo check what this returns in console log //rebecca
     const contentWords = (articleContent || "").split(/\s+/).slice(0, 10).join(" ");
     const descriptionWords = (article.description || "").split(/\s+/).slice(0, 10).join(" ");
-    console.log("contentwords, what is returned? : ", contentWords);
-    console.log("descriptionWords, what is returned? : ", descriptionWords);
+    
     
     if (contentWords === descriptionWords) {
         article.description = "";
