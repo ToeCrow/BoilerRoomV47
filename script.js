@@ -30,11 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// The code above adds an event listener to the document object.
-// When the "DOMContentLoaded" event is triggered, which is when the initial HTML document has been completely loaded and parsed,
-// the fetchAllCategories function is called.
-
-// async function fetchNews(urlNews) {
     async function fetchNews(url) {
         console.log(`Fetching news from URL: ${url}`);
         try {
@@ -413,12 +408,6 @@ async function fetchNewsFromUrls(urlNews) {
 // FILTER
 
   const categoryFilterDropdown = document.getElementById("category-filter");
-
- /*  categoryFilterDropdown.addEventListener("change", (event) => {
-    const selectedCategory = event.target.value;
-    displayNews(JSON.parse(localStorage.getItem(selectedCategory)));
-  }); */
-
   
   categoryFilterDropdown.addEventListener("change", async (event) => {
     const selectedCategory = event.target.value;
