@@ -55,3 +55,12 @@ möte med Mandus för att få lite hjälp att hitta en lösning på detta. Vi be
 
 Vi måste översätta data från guardian till newsapi så vi får inte samma data till resten av koden.
 Vi mergar allt till staging så vi har samma utgångspunkt.
+
+började tidigare på måndag för att vi var lite längre ifrån denna gången.
+Tog upp att samarbetetet inte fungerat bra denna gången. Vissa tar mer ansvar andra mindre. Vi måste stoppa upp och göra bättre standup. Även om vi pratat om det sist så klarar vi inte av att utförar det denna gången heller. Det blir tydligare när det ökar svårighet att vi inte drar jämnt.
+Vi vill testa att börja om för att inte få med tidigare "fel" in i nästa uppgift.
+
+Retro
+BRA: Vi har tagit upp och ser en utmaning att lösa med grupparbete. Vi hade mycket klart sen förra veckan. Bra at börja torsdag
+KAN BLI BÄTTRE: Planera bättre tidigare även om det tar tid, ta hjälp av Mandus (annan coach). Kommuniktion och tydliga stopp. Fördelningen av arbetet lider pga dessa punkter
+TA MED OSS VIDARE: Inte fortsätta på gammal kod, hellre börja om. Sen går denna delen mycket i förra punkten.
