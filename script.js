@@ -30,6 +30,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// store array in localstorage
+async function fetchAllCategories() {
+    const categoriesArray = ["culture", "general", "technology", "sports", "science", "health", "entertainment", "business"]; //todo remove culture if we are only displaying "top news, also remove from dropdown in HTML"
+    console.log("Fetching all categories:", categoriesArray);
+
+    await Promise.all(
+        categoriesArray.map(async (category) => {
+            // Fetch from News API
+            const newsApiUrl = getCategoryApiUrl(category, "newsapi");  //data.js
+            console.log(`Fetching News API for category ${category}: ${newsApiUrl}`);
+            const newsApiArticles = await fetchNews(newsApiUrl);
+
+            // Fetch from Guardian API
+            const guardianApiUrl = getCategoryApiUrl(category, "guardian");
+            console.log(`Fetching Guardian API for category ${category}: ${guardianApiUrl}`);
+            const guardianApiArticles = await fetchNews(guardianApiUrl);
+
+            // Combine articles from both APIs
+            const combinedArticles = [...newsApiArticles, ...guardianApiArticles];
+            console.log(`Combined articles for category ${category}:`, combinedArticles);
+
+            // Store in localStorage in data.js
+            storeArticlesArrayInLocalStorage(combinedArticles, category);
+        })
+    );
+}
+
+
+
     async function fetchNews(url) {
         console.log(`Fetching news from URL: ${url}`);
         try {
@@ -95,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return [];
             }
     
-            // Process Guardian API responses through `translateGuardianNews()`
+            // Process Guardian API responses through `translateGuardianNews()` //!utils.js
             if (url.includes("content.guardianapis.com")) {
                 console.log("Processing Guardian API data through translateGuardianNews()");
                 const translatedArticles = translateGuardianNews(data.response.results);
@@ -120,6 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     
+    //Benjamin kör vidare
 
 
     //uppdate formatdate
@@ -147,6 +177,7 @@ function cleanInput(input) {
   return input.replace(/^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$/g, "").trim();
 }
 
+// ny url
 function searchNews() {
 
   const cleanedQuery = cleanInput(searchInput.value);
@@ -230,7 +261,7 @@ function displayNews(data) {
     });
 
 }
-
+//Abdi
 
   function createNewsElement(title, description, source, date, url, content, urlToImage) {
     const newsItem = document.createElement("li");
@@ -282,6 +313,7 @@ function displayNews(data) {
     newsList.appendChild(newsItem);
 }
 
+//har inte ändrats
 function createInfoModal(article) {
     const modal = document.getElementById("moreInfoModal");
     let articleContent = article.content || "";
@@ -326,33 +358,6 @@ function createInfoModal(article) {
     closeBtn.addEventListener("click", closeModal);
 }
 
-// store array in localstorage
-async function fetchAllCategories() {
-    const categoriesArray = ["culture", "general", "technology", "sports", "science", "health", "entertainment", "business"]; //todo remove culture if we are only displaying "top news, also remove from dropdown in HTML"
-    console.log("Fetching all categories:", categoriesArray);
-
-    await Promise.all(
-        categoriesArray.map(async (category) => {
-            // Fetch from News API
-            const newsApiUrl = getCategoryApiUrl(category, "newsapi");
-            console.log(`Fetching News API for category ${category}: ${newsApiUrl}`);
-            const newsApiArticles = await fetchNews(newsApiUrl);
-
-            // Fetch from Guardian API
-            const guardianApiUrl = getCategoryApiUrl(category, "guardian");
-            console.log(`Fetching Guardian API for category ${category}: ${guardianApiUrl}`);
-            const guardianApiArticles = await fetchNews(guardianApiUrl);
-
-            // Combine articles from both APIs
-            const combinedArticles = [...newsApiArticles, ...guardianApiArticles];
-            console.log(`Combined articles for category ${category}:`, combinedArticles);
-
-            // Store in localStorage
-            storeArticlesArrayInLocalStorage(combinedArticles, category);
-        })
-    );
-}
-
 
 let searchTerm = searchInput.value;
 
@@ -365,7 +370,6 @@ searchButton.addEventListener("click", async () => {
     localStorage.setItem("search term", searchTerm);
     localStorage.setItem("savedSelectedCategory", "");
 
-    console.log("saved searchTerm: ", searchTerm);
     
     // reset the dropdown to default
     categoryFilterDropdown.value = "";
@@ -373,16 +377,16 @@ searchButton.addEventListener("click", async () => {
     const urlSearch = searchNews();
     
     if (!urlSearch) {
-        console.log("No valid urlNews to fetch data from.");
+        console.log("No valid url to fetch data from.");
         return; // Stops if no valid urlSearch
     }
 
-    console.log("Fetching articles from search URLs...");
+   
     const fetchedArticles = await fetchNewsFromUrls(urlSearch); // Await the resolution of the promise
-    console.log("Fetched articles:", fetchedArticles);
+   
 
     const validArticles = getValidArticles(fetchedArticles); // Pass resolved articles to the filtering function
-    console.log("Valid articles after filtering:", validArticles);
+ 
 
     displayNews(validArticles); // Display the filtered articles
 
@@ -390,7 +394,7 @@ searchButton.addEventListener("click", async () => {
     storeArticlesArrayInLocalStorage(validArticles, "saved search");
 });
 
-
+//Rebecca takes us home
 async function fetchNewsFromUrls(urlNews) {
     const results = [];
     for (const url of urlNews) {
@@ -453,7 +457,7 @@ async function fetchNewsFromUrls(urlNews) {
 });
 
 
-//   fetchtimer (10 minuter)
+//   fetchtimer (10 minuter) //! Fick inte in denna i koden denna gång
 let isFetching = false;
 
 function fetchNewsTimer() {
