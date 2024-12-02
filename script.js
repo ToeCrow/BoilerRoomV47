@@ -115,9 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
 
-// function translate Guardian API results to API News format
-
-
 
     //uppdate formatdate
  function formatDate(publishedAt) {
